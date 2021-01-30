@@ -26,9 +26,10 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"tgdb"
 	"strconv"
 	"time"
+
+	"github.com/yxuco/tgdb"
 )
 
 func BigDecimalToByteArray(bd float64) ([]byte, error) {

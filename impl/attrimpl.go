@@ -30,8 +30,9 @@ import (
 	"strconv"
 	"strings"
 	"sync/atomic"
-	"tgdb"
 	"time"
+
+	"github.com/yxuco/tgdb"
 )
 
 // ======= Attribute Types =======
@@ -78,8 +79,6 @@ var PreDefinedAttributeTypes = map[int]AttributeType{
 	AttributeTypeBlob:      {typeId: AttributeTypeBlob, typeName: "[]uint8", implementor: "BlobAttribute"},
 	AttributeTypeClob:      {typeId: AttributeTypeClob, typeName: "[]rune", implementor: "ClobAttribute"},
 }
-
-
 
 ////////////////////////////////////////
 // Helper functions for AttributeType //
@@ -130,7 +129,6 @@ func GetAttributeTypeFromName(aName string) *AttributeType {
 	invalid := PreDefinedAttributeTypes[AttributeTypeInvalid]
 	return &invalid
 }
-
 
 var LocalAttributeId int64
 
@@ -425,7 +423,6 @@ const (
 	TGZoneId     = 1
 	TGZoneName   = 2
 )
-
 
 type AbstractAttribute struct {
 	owner      tgdb.TGEntity
@@ -871,8 +868,6 @@ func NewBooleanAttributeWithDesc(ownerEntity tgdb.TGEntity, attrDesc *AttributeD
 	return newAttribute
 }
 
-
-
 /////////////////////////////////////////////////////////////////
 // Helper functions for BooleanAttribute
 /////////////////////////////////////////////////////////////////
@@ -1004,9 +999,9 @@ func (obj *BooleanAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *BooleanAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("BooleanAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -1370,7 +1365,6 @@ func WriteExternal(attrTypeId int, os tgdb.TGOutputStream) tgdb.TGError {
 	return attr.WriteExternal(os)
 }
 
-
 type ByteAttribute struct {
 	*AbstractAttribute
 }
@@ -1577,9 +1571,9 @@ func (obj *ByteAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *ByteAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("ByteAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -1625,7 +1619,6 @@ func (obj *ByteAttribute) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 type CharAttribute struct {
 	*AbstractAttribute
@@ -1790,9 +1783,9 @@ func (obj *CharAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *CharAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("CharAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -1838,7 +1831,6 @@ func (obj *CharAttribute) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 type DoubleAttribute struct {
 	*AbstractAttribute
@@ -2022,9 +2014,9 @@ func (obj *DoubleAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *DoubleAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("DoubleAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -2070,8 +2062,6 @@ func (obj *DoubleAttribute) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type FloatAttribute struct {
 	*AbstractAttribute
@@ -2255,9 +2245,9 @@ func (obj *FloatAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *FloatAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("FloatAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -2345,13 +2335,17 @@ func NewIntegerAttributeWithDesc(ownerEntity tgdb.TGEntity, attrDesc *AttributeD
 /////////////////////////////////////////////////////////////////
 
 func round64(val float64) int {
-	if val < 0 { return int(val-0.5) }
-	return int(val+0.5)
+	if val < 0 {
+		return int(val - 0.5)
+	}
+	return int(val + 0.5)
 }
 
 func round32(val float32) int {
-	if val < 0 { return int(val-0.5) }
-	return int(val+0.5)
+	if val < 0 {
+		return int(val - 0.5)
+	}
+	return int(val + 0.5)
 }
 
 func (obj *IntegerAttribute) SetInteger(b int) {
@@ -2498,9 +2492,9 @@ func (obj *IntegerAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *IntegerAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("IntegerAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -2547,8 +2541,6 @@ func (obj *IntegerAttribute) UnmarshalBinary(data []byte) error {
 	return err
 }
 
-
-
 type LongAttribute struct {
 	*AbstractAttribute
 }
@@ -2590,13 +2582,17 @@ func NewLongAttributeWithDesc(ownerEntity tgdb.TGEntity, attrDesc *AttributeDesc
 /////////////////////////////////////////////////////////////////
 
 func lRound64(val float64) int64 {
-	if val < 0 { return int64(val-0.5) }
-	return int64(val+0.5)
+	if val < 0 {
+		return int64(val - 0.5)
+	}
+	return int64(val + 0.5)
 }
 
 func lRound32(val float32) int64 {
-	if val < 0 { return int64(val-0.5) }
-	return int64(val+0.5)
+	if val < 0 {
+		return int64(val - 0.5)
+	}
+	return int64(val + 0.5)
 }
 
 func (obj *LongAttribute) SetLong(b int64) {
@@ -2745,9 +2741,9 @@ func (obj *LongAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *LongAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("LongAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -2793,7 +2789,6 @@ func (obj *LongAttribute) UnmarshalBinary(data []byte) error {
 	}
 	return err
 }
-
 
 type NumberAttribute struct {
 	*AbstractAttribute
@@ -2912,10 +2907,10 @@ func (obj *NumberAttribute) SetValue(value interface{}) tgdb.TGError {
 		return nil
 	}
 
-	precision := 20 	// Default Precision
-	scale := 5			// Default Scale
+	precision := 20 // Default Precision
+	scale := 5      // Default Scale
 
-	if 	reflect.TypeOf(value).Kind() != reflect.Float32 &&
+	if reflect.TypeOf(value).Kind() != reflect.Float32 &&
 		reflect.TypeOf(value).Kind() != reflect.Float64 &&
 		reflect.TypeOf(value).Kind() != reflect.Int32 &&
 		reflect.TypeOf(value).Kind() != reflect.Int64 &&
@@ -2950,7 +2945,7 @@ func (obj *NumberAttribute) SetValue(value interface{}) tgdb.TGError {
 		v1 := value.(int64)
 		scale = 0
 		precision = len(strconv.Itoa(int(v1)))
-		obj.SetDecimal(NewTGDecimal(value.(int64),0), precision, scale)
+		obj.SetDecimal(NewTGDecimal(value.(int64), 0), precision, scale)
 	} else if reflect.TypeOf(value).Kind() == reflect.Float32 ||
 		reflect.TypeOf(value).Kind() == reflect.Float64 {
 		v1 := value.(float64)
@@ -3045,7 +3040,7 @@ func (obj *NumberAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 	//strValue := strconv.FormatFloat(dValue, 'f', int(obj.GetAttributeDescriptor().GetPrecision()), 64)
 	//newStr := strings.Replace(strValue, ".", "", -1)
 	dValue := obj.AttrValue.(string)
-	newStr := dValue	//strings.Replace(dValue, ".", "", -1)
+	newStr := dValue //strings.Replace(dValue, ".", "", -1)
 	if logger.IsDebug() {
 		logger.Debug(fmt.Sprintf("Inside NumberAttribute::WriteValue newStr is '%+v'", newStr))
 	}
@@ -3055,9 +3050,9 @@ func (obj *NumberAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *NumberAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("NumberAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -3104,7 +3099,6 @@ func (obj *NumberAttribute) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 type ShortAttribute struct {
 	*AbstractAttribute
 }
@@ -3146,13 +3140,17 @@ func NewShortAttributeWithDesc(ownerEntity tgdb.TGEntity, attrDesc *AttributeDes
 /////////////////////////////////////////////////////////////////
 
 func sRound64(val float64) int16 {
-	if val < 0 { return int16(val-0.5) }
-	return int16(val+0.5)
+	if val < 0 {
+		return int16(val - 0.5)
+	}
+	return int16(val + 0.5)
 }
 
 func sRound32(val float32) int16 {
-	if val < 0 { return int16(val-0.5) }
-	return int16(val+0.5)
+	if val < 0 {
+		return int16(val - 0.5)
+	}
+	return int16(val + 0.5)
 }
 
 func (obj *ShortAttribute) SetShort(b int16) {
@@ -3297,9 +3295,9 @@ func (obj *ShortAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *ShortAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("ShortAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -3511,9 +3509,9 @@ func (obj *StringAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *StringAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("StringAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -3560,7 +3558,6 @@ func (obj *StringAttribute) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 type TimestampAttribute struct {
 	*AbstractAttribute
 }
@@ -3602,7 +3599,7 @@ func NewTimestampAttributeWithDesc(ownerEntity tgdb.TGEntity, attrDesc *Attribut
 /////////////////////////////////////////////////////////////////
 
 func (obj *TimestampAttribute) SetCalendar(b time.Time) {
-	if ! obj.IsNull() {
+	if !obj.IsNull() {
 		return
 	}
 	obj.AttrValue = b
@@ -3917,9 +3914,9 @@ func (obj *TimestampAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 func (obj *TimestampAttribute) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("TimestampAttribute:{")
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -3965,7 +3962,6 @@ func (obj *TimestampAttribute) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 var UniqueId int64
 
@@ -4128,7 +4124,7 @@ func (obj *BlobAttribute) SetValue(value interface{}) tgdb.TGError {
 		return nil
 	}
 
-	if 	reflect.TypeOf(value).Kind() != reflect.Float32 &&
+	if reflect.TypeOf(value).Kind() != reflect.Float32 &&
 		reflect.TypeOf(value).Kind() != reflect.Float64 &&
 		reflect.TypeOf(value).Kind() != reflect.Array &&
 		reflect.TypeOf(value).Kind() != reflect.Struct &&
@@ -4219,9 +4215,9 @@ func (obj *BlobAttribute) String() string {
 	buffer.WriteString("BlobAttribute:{")
 	buffer.WriteString(fmt.Sprintf("EntityId: %+v", obj.entityId))
 	buffer.WriteString(fmt.Sprintf(", IsCached: %+v", obj.isCached))
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -4267,7 +4263,6 @@ func (obj *BlobAttribute) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 type ClobAttribute struct {
 	*BlobAttribute
@@ -4458,9 +4453,9 @@ func (obj *ClobAttribute) String() string {
 	buffer.WriteString("ClobAttribute:{")
 	buffer.WriteString(fmt.Sprintf("EntityId: %+v", obj.entityId))
 	buffer.WriteString(fmt.Sprintf(", IsCached: %+v", obj.isCached))
-	strArray := []string{buffer.String(), obj.attributeToString()+"}"}
+	strArray := []string{buffer.String(), obj.attributeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 //@Override

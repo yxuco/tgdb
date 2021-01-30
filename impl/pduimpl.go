@@ -29,13 +29,13 @@ import (
 	"io"
 	"math"
 	"reflect"
-	"tgdb"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
-)
 
+	"github.com/yxuco/tgdb"
+)
 
 const (
 	AbstractMessage int = -100
@@ -171,9 +171,8 @@ func (obj *CommandVerbs) GetImplementor() string {
 	return obj.implementor
 }
 
-
 type ProtocolDataInputStream struct {
-	mark                int	// Private Internal Marker - Not to be serialized / de-serialized
+	mark                int // Private Internal Marker - Not to be serialized / de-serialized
 	Buf                 []byte
 	BufLen              int
 	iStreamCurPos       int
@@ -277,7 +276,7 @@ func (msg *ProtocolDataInputStream) ReadFullyAtPos(b []byte, readCurPos, readLen
 		return nil, GetErrorByType(TGErrorIOException, INTERNAL_SERVER_ERROR, errMsg, "")
 	}
 	// Copy in input buffer b at offset for length
-	copy(b, msg.Buf[msg.iStreamCurPos:(msg.iStreamCurPos +readLen)])
+	copy(b, msg.Buf[msg.iStreamCurPos:(msg.iStreamCurPos+readLen)])
 	//logger.Debug(fmt.Sprintf("Inside ProtocolDataInputStream::ReadFullyAtPos() temp / b is '%+v'", b))
 	msg.iStreamCurPos = msg.iStreamCurPos + readLen
 	//logger.Log(fmt.Sprintf("Returning ProtocolDataInputStream::ReadFullyAtPos('%d') for length '%d' from '%+v' in contents", readCurPos, readLen, b))
@@ -521,7 +520,7 @@ func (msg *ProtocolDataInputStream) String() string {
 // Available checks whether there is any data available on the stream to read
 func (msg *ProtocolDataInputStream) Available() (int, tgdb.TGError) {
 	//if msg.BufLen == 0 || (msg.BufLen-msg.CurPos) < 0 {
-	if (msg.BufLen-msg.iStreamCurPos) < 0 {
+	if (msg.BufLen - msg.iStreamCurPos) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning ProtocolDataInputStream::Available as (msg.BufLen-msg.CurPos) < 0"))
 		errMsg := fmt.Sprint("Invalid data length of Protocol Data Input Stream")
 		return 0, GetErrorByType(TGErrorInvalidMessageLength, INTERNAL_SERVER_ERROR, errMsg, "")
@@ -768,11 +767,11 @@ func (msg *ProtocolDataInputStream) SetReferenceMap(rMap map[int64]tgdb.TGEntity
 // Skip skips n bytes
 func (msg *ProtocolDataInputStream) Skip(n int64) (int64, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering ProtocolDataInputStream::Skip('%d') in the contents", n))
+		logger.Debug(fmt.Sprintf("Entering ProtocolDataInputStream::Skip('%d') in the contents", n))
 	}
 	a, err := msg.SkipBytes(int(n))
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning ProtocolDataInputStream::Skip('%d'), contents are '%+v'", int64(a), msg.Buf))
+		logger.Debug(fmt.Sprintf("Returning ProtocolDataInputStream::Skip('%d'), contents are '%+v'", int64(a), msg.Buf))
 	}
 	return int64(a), err
 }
@@ -792,7 +791,6 @@ func (msg *ProtocolDataInputStream) MarshalBinary() ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-
 var writeBuf = ""
 
 /////////////////////////////////////////////////////////////////
@@ -810,13 +808,11 @@ func (msg *ProtocolDataInputStream) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 type ProtocolDataOutputStream struct {
 	Buf              []byte
 	oStreamBufLen    int
 	oStreamByteCount int
 }
-
 
 /////////////////////////////////////////////////////////////////
 // Helper functions for ProtocolDataInputStream
@@ -847,9 +843,9 @@ func (msg *ProtocolDataOutputStream) String() string {
 	buffer.WriteString(fmt.Sprintf("Buffer Length: %d", msg.oStreamBufLen))
 	buffer.WriteString(fmt.Sprintf(", Count: %d", msg.oStreamByteCount))
 	buffer.WriteString(fmt.Sprintf(", Buffer: "))
-	strArray := []string{buffer.String(), bytes.NewBuffer(msg.Buf).String()+"}"}
+	strArray := []string{buffer.String(), bytes.NewBuffer(msg.Buf).String() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 func (msg *ProtocolDataOutputStream) WriteBoolean(value bool) {
@@ -898,7 +894,7 @@ func (msg *ProtocolDataOutputStream) WriteChars(value string) {
 	//logger.Log(fmt.Sprintf("Entering ProtocolDataOutputStream::WriteChars('%+v') in contents", value))
 	sLen := len(value)
 	msg.Ensure(sLen)
-	for i := 0 ; i < sLen ; i++ {
+	for i := 0; i < sLen; i++ {
 		msg.WriteChar(int(value[i]))
 	}
 	//logger.Log(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteChars('%+v') in contents '%+v'", value, msg.Buf))
@@ -955,7 +951,7 @@ func (msg *ProtocolDataOutputStream) WriteLong(value int64) {
 	//logger.Log(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteLong('%+v') in contents '%+v'", value, msg.Buf))
 }
 
-func (msg *ProtocolDataOutputStream) WriteShort(value int)  {
+func (msg *ProtocolDataOutputStream) WriteShort(value int) {
 	//logger.Log(fmt.Sprintf("Entering ProtocolDataOutputStream::WriteShort('%+v') in contents", value))
 	if (msg.oStreamByteCount + 2) >= msg.oStreamBufLen {
 		msg.Ensure(2)
@@ -969,14 +965,14 @@ func (msg *ProtocolDataOutputStream) WriteShort(value int)  {
 
 func (msg *ProtocolDataOutputStream) WriteBytesFromPos(value []byte, writePos, writeLen int) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering ProtocolDataOutputStream::WriteBytesFromPos('%d') for len '%d' from '%+v' in contents", writePos, writeLen, value))
+		logger.Debug(fmt.Sprintf("Entering ProtocolDataOutputStream::WriteBytesFromPos('%d') for len '%d' from '%+v' in contents", writePos, writeLen, value))
 	}
 	if value == nil {
 		logger.Error(fmt.Sprintf("ERROR: Returning ProtocolDataOutputStream:WriteBytesFromPos - invalid byte value specified to be written at pos %d", writePos))
 		errMsg := fmt.Sprintf("Invalid byte value specified to be written at pos %d", writePos)
 		return GetErrorByType(TGErrorIOException, INTERNAL_SERVER_ERROR, errMsg, "")
 	}
-	if writePos < 0 || writePos > len(value) || writeLen < 0 || (writePos + writeLen) > len(value) || (writePos + writeLen) < 0 {
+	if writePos < 0 || writePos > len(value) || writeLen < 0 || (writePos+writeLen) > len(value) || (writePos+writeLen) < 0 {
 		logger.Error(fmt.Sprintf("ERROR: Returning ProtocolDataOutputStream:WriteBytesFromPos - either invalid pos %d or write length %d specified", writeLen, writePos))
 		errMsg := fmt.Sprintf("Either invalid pos %d or write length %d specified", writeLen, writePos)
 		return GetErrorByType(TGErrorIOException, INTERNAL_SERVER_ERROR, errMsg, "")
@@ -989,7 +985,7 @@ func (msg *ProtocolDataOutputStream) WriteBytesFromPos(value []byte, writePos, w
 	copy(msg.Buf[msg.oStreamByteCount:], tempBuf[:writeLen])
 	msg.oStreamByteCount += writeLen
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteBytesFromPos(''%d') for len '%d' from '%+v' in contents '%+v'", writePos, writeLen, value, msg.Buf))
+		logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteBytesFromPos(''%d') for len '%d' from '%+v' in contents '%+v'", writePos, writeLen, value, msg.Buf))
 	}
 	return nil
 }
@@ -999,8 +995,8 @@ func (msg *ProtocolDataOutputStream) WriteUTF(str string) tgdb.TGError {
 	start := msg.oStreamByteCount
 	sLen := 0
 
-	if msg.oStreamByteCount+ 2 > msg.oStreamBufLen {
-		msg.Ensure(2 + len(str) * 3)
+	if msg.oStreamByteCount+2 > msg.oStreamBufLen {
+		msg.Ensure(2 + len(str)*3)
 	}
 	msg.oStreamByteCount += 2
 
@@ -1013,7 +1009,7 @@ func (msg *ProtocolDataOutputStream) WriteUTF(str string) tgdb.TGError {
 	}
 
 	// Now write length
-	msg.Buf[start]   = byte((sLen >> 8) & 0xFF)
+	msg.Buf[start] = byte((sLen >> 8) & 0xFF)
 	msg.Buf[start+1] = byte(sLen & 0xFF)
 	//logger.Log(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteUTF('%+v') in contents '%+v'", str, msg.Buf))
 	return nil
@@ -1041,12 +1037,12 @@ func (msg *ProtocolDataOutputStream) GetPosition() int {
 // SkipNBytes skips n bytes. Allocate if necessary
 func (msg *ProtocolDataOutputStream) SkipNBytes(n int) {
 	//logger.Log(fmt.Sprintf("Entering ProtocolDataOutputStream::SkipNBytes('%d') in contents", n))
-	if msg.oStreamByteCount+ n > msg.oStreamBufLen {
+	if msg.oStreamByteCount+n > msg.oStreamBufLen {
 		msg.Ensure(n)
 	}
 	msg.oStreamByteCount += n
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::SkipNBytes('%d') in contents are '%+v'", n, msg))
+		logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::SkipNBytes('%d') in contents are '%+v'", n, msg))
 	}
 }
 
@@ -1096,10 +1092,10 @@ func (msg *ProtocolDataOutputStream) WriteByteAt(pos int, value int) (int, tgdb.
 func (msg *ProtocolDataOutputStream) WriteBytes(buf []byte) tgdb.TGError {
 	//logger.Log(fmt.Sprintf("Entering ProtocolDataOutputStream::WriteBytes('%+v') in contents", buf))
 	bLen := len(buf)
-	msg.Ensure(bLen+4)
+	msg.Ensure(bLen + 4)
 	msg.WriteInt(bLen)
 
-	for i := 0; i < bLen ; i++ {
+	for i := 0; i < bLen; i++ {
 		msg.WriteByte(int(buf[i]))
 	}
 	//logger.Log(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteBytes('%+v') in contents are '%+v'", buf, msg.Buf))
@@ -1115,7 +1111,7 @@ func (msg *ProtocolDataOutputStream) WriteBytesAt(pos int, s string) (int, tgdb.
 		return -1, GetErrorByType(TGErrorIOException, INTERNAL_SERVER_ERROR, errMsg, "")
 	}
 
-	for i := 0; i < sLen ; i++ {
+	for i := 0; i < sLen; i++ {
 		v, err := fmt.Scanf("%d", s[i])
 		if err != nil {
 			logger.Error(fmt.Sprintf("ERROR: Returning ProtocolDataOutputStream:WriteBytesAt - Unable to get character at position %d from string %s", i, s))
@@ -1159,7 +1155,7 @@ func (msg *ProtocolDataOutputStream) WriteCharsAt(pos int, s string) (int, tgdb.
 		return -1, GetErrorByType(TGErrorIOException, INTERNAL_SERVER_ERROR, errMsg, "")
 	}
 
-	for i := 0; i < sLen ; i++ {
+	for i := 0; i < sLen; i++ {
 		v, err := fmt.Scanf("%d", s[i])
 		if err != nil {
 			logger.Error(fmt.Sprintf("ERROR: Returning ProtocolDataOutputStream:WriteCharsAt - Unable to get character at position %d from string %s", i, s))
@@ -1255,7 +1251,7 @@ func (msg *ProtocolDataOutputStream) WriteLongAt(pos int, value int64) (int, tgd
 	msg.Buf[pos+7] = byte(b)
 
 	//logger.Log(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteLongAt(Pos '%d' - '%+v') in contents are '%+v'", pos+8, value, msg.Buf)
-	return pos+8, nil
+	return pos + 8, nil
 }
 
 // WriteShortAt writes a Java Char at the position. Buffer should have sufficient space to write the content.
@@ -1282,13 +1278,13 @@ func (msg *ProtocolDataOutputStream) WriteUTFString(str string) (int, tgdb.TGErr
 	i := 0
 	c := 0
 
-	if (msg.oStreamByteCount + 3 * sLen) > msg.oStreamBufLen {
+	if (msg.oStreamByteCount + 3*sLen) > msg.oStreamBufLen {
 		msg.Ensure(len(str) * 3)
 	}
 	writeBuf = str[0:sLen]
 
 	for {
-		if ! (i < sLen) {
+		if !(i < sLen) {
 			//logger.Debug(fmt.Sprintf("ProtocolDataOutputStream::WriteUTFString - Breaking loop i='%d', c='%d', msg.Count='%d', msg.Buf[msg.Count]='%d'", i, c, msg.Count, msg.Buf[msg.Count]))
 			break
 		}
@@ -1338,7 +1334,7 @@ func (msg *ProtocolDataOutputStream) WriteVarLong(value int64) tgdb.TGError {
 		msg.Buf[msg.oStreamByteCount] = U64PACKED_NULL
 		msg.oStreamByteCount++
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
+			logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
 		}
 		return nil
 	}
@@ -1350,7 +1346,7 @@ func (msg *ProtocolDataOutputStream) WriteVarLong(value int64) tgdb.TGError {
 		msg.Buf[msg.oStreamByteCount] = byte(value)
 		msg.oStreamByteCount++
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
+			logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
 		}
 		return nil
 	}
@@ -1365,7 +1361,7 @@ func (msg *ProtocolDataOutputStream) WriteVarLong(value int64) tgdb.TGError {
 		msg.Buf[msg.oStreamByteCount] = byte(value)
 		msg.oStreamByteCount++
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
+			logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
 		}
 		return nil
 	}
@@ -1377,11 +1373,11 @@ func (msg *ProtocolDataOutputStream) WriteVarLong(value int64) tgdb.TGError {
 		value |= 0xC0000000
 		msg.oStreamByteCount += 4
 		for i := 1; i < 4; i++ {
-			msg.Buf[msg.oStreamByteCount- 1] = byte(value)
+			msg.Buf[msg.oStreamByteCount-1] = byte(value)
 			value = value >> 8
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
+			logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
 		}
 		return nil
 	}
@@ -1407,12 +1403,12 @@ func (msg *ProtocolDataOutputStream) WriteVarLong(value int64) tgdb.TGError {
 	msg.oStreamByteCount++
 
 	cnt += cnt
-	for i:=1; i<=cnt; i++ {
-		msg.Buf[cnt - i] = byte(value)
+	for i := 1; i <= cnt; i++ {
+		msg.Buf[cnt-i] = byte(value)
 		value = value >> 8
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
+		logger.Debug(fmt.Sprintf("Returning ProtocolDataOutputStream::WriteVarLong('%+v') in contents are '%+v'", value, msg.Buf))
 	}
 	return nil
 }
@@ -1447,7 +1443,6 @@ func (msg *ProtocolDataOutputStream) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 func DefaultProtocolDataInputStream() *ProtocolDataInputStream {
 	// We must register the concrete type for the encoder and decoder (which would
 	// normally be on a separate machine from the encoder). On each end, this tells the
@@ -1471,8 +1466,6 @@ func NewProtocolDataInputStream(buf []byte) *ProtocolDataInputStream {
 	newStream.BufLen = len(buf)
 	return newStream
 }
-
-
 
 func DefaultProtocolDataOutputStream() *ProtocolDataOutputStream {
 	// We must register the concrete type for the encoder and decoder (which would
@@ -1508,9 +1501,6 @@ func intToBytes(value int, bytes []byte, offset int) {
 	}
 }
 */
-
-
-
 
 /**
  * The Server describes the pdu header as below.
@@ -1665,7 +1655,7 @@ type AbstractProtocolMessage struct {
 	isUpdatable bool
 	bytesBuffer []byte
 	contentLock sync.Mutex // reentrant-lock for synchronizing sending/receiving messages over the wire
-	tenantId int
+	tenantId    int
 }
 
 func DefaultAbstractProtocolMessage() *AbstractProtocolMessage {
@@ -1678,7 +1668,7 @@ func DefaultAbstractProtocolMessage() *AbstractProtocolMessage {
 		MessageHeader: defaultMessageHeader(),
 		isUpdatable:   false,
 		bytesBuffer:   make([]byte, 0),
-		tenantId: 0,
+		tenantId:      0,
 	}
 	newMsg.BufLength = binary.Size(reflect.ValueOf(newMsg))
 	return &newMsg
@@ -1704,14 +1694,13 @@ func (msg *AbstractProtocolMessage) SetUpdatableFlag(updateFlag bool) {
 	msg.isUpdatable = updateFlag
 }
 
-func (msg *AbstractProtocolMessage) GetTenantId() int{
+func (msg *AbstractProtocolMessage) GetTenantId() int {
 	return msg.tenantId
 }
 
 func (msg *AbstractProtocolMessage) SetTenantId(id int) {
 	msg.tenantId = id
 }
-
 
 func (msg *AbstractProtocolMessage) SetSequenceAndTimeStamp(timestamp int64) tgdb.TGError {
 	if !(msg.GetIsUpdatable() || timestamp != -1) {
@@ -1919,7 +1908,7 @@ func VerbIdFromBytes(buffer []byte) (*CommandVerbs, tgdb.TGError) {
 		return nil, CreateExceptionByType(TGErrorInvalidMessageLength)
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AbstractProtocolMessage:VerbIdFromBytes - received input buffer as '%+v'", buffer))
+		logger.Debug(fmt.Sprintf("Entering AbstractProtocolMessage:VerbIdFromBytes - received input buffer as '%+v'", buffer))
 	}
 
 	is := NewProtocolDataInputStream(buffer)
@@ -1931,7 +1920,7 @@ func VerbIdFromBytes(buffer []byte) (*CommandVerbs, tgdb.TGError) {
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:VerbIdFromBytes - extracted bufLen: '%d'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:VerbIdFromBytes - extracted bufLen: '%d'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -1945,7 +1934,7 @@ func VerbIdFromBytes(buffer []byte) (*CommandVerbs, tgdb.TGError) {
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:VerbIdFromBytes - extracted magic id: '%d'", magic))
+		logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:VerbIdFromBytes - extracted magic id: '%d'", magic))
 	}
 	if magic != GetMagic() {
 		errMsg := fmt.Sprint("Bad Magic id")
@@ -1959,7 +1948,7 @@ func VerbIdFromBytes(buffer []byte) (*CommandVerbs, tgdb.TGError) {
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:VerbIdFromBytes - extracted protocolVersion: '%d'", protocolVersion))
+		logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:VerbIdFromBytes - extracted protocolVersion: '%d'", protocolVersion))
 	}
 	if protocolVersion != int16(GetProtocolVersion()) {
 		errMsg := fmt.Sprint("Unsupported protocol version")
@@ -1987,7 +1976,7 @@ func (msg *AbstractProtocolMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 		return nil, CreateExceptionByType(TGErrorInvalidMessageLength)
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AbstractProtocolMessage:FromBytes - received input buffer as '%+v'", buffer))
+		logger.Debug(fmt.Sprintf("Entering AbstractProtocolMessage:FromBytes - received input buffer as '%+v'", buffer))
 	}
 
 	is := NewProtocolDataInputStream(buffer)
@@ -1999,7 +1988,7 @@ func (msg *AbstractProtocolMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:FromBytes read bufLen as '%d'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside AbstractProtocolMessage:FromBytes read bufLen as '%d'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -2007,7 +1996,7 @@ func (msg *AbstractProtocolMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AbstractProtocolMessage:FromBytes about to read Header data elements"))
+		logger.Debug(fmt.Sprint("Inside AbstractProtocolMessage:FromBytes about to read Header data elements"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -2016,7 +2005,7 @@ func (msg *AbstractProtocolMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AbstractProtocolMessage:FromBytes about to read Payload data elements"))
+		logger.Debug(fmt.Sprint("Inside AbstractProtocolMessage:FromBytes about to read Payload data elements"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -2025,7 +2014,7 @@ func (msg *AbstractProtocolMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AbstractProtocolMessage:FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning AbstractProtocolMessage:FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -2033,7 +2022,7 @@ func (msg *AbstractProtocolMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *AbstractProtocolMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AbstractProtocolMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering AbstractProtocolMessage:ToBytes"))
 	}
 
 	msg.contentLock.Lock()
@@ -2066,7 +2055,7 @@ func (msg *AbstractProtocolMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		bufLength = len(msg.bytesBuffer)
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AbstractProtocolMessage:ToBytes resulted bytes-on-the-wire in '%+v'", msg.bytesBuffer))
+		logger.Debug(fmt.Sprintf("Returning AbstractProtocolMessage:ToBytes resulted bytes-on-the-wire in '%+v'", msg.bytesBuffer))
 	}
 	return msg.bytesBuffer, bufLength, nil
 }
@@ -2226,7 +2215,6 @@ func (msg *AbstractProtocolMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 type AuthenticatedMessage struct {
 	*AbstractProtocolMessage
 	connectionId int
@@ -2334,12 +2322,12 @@ func (msg *AuthenticatedMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *AuthenticatedMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticatedMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering AuthenticatedMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticatedMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside AuthenticatedMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -2348,7 +2336,7 @@ func (msg *AuthenticatedMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticatedMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside AuthenticatedMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -2362,7 +2350,7 @@ func (msg *AuthenticatedMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticatedMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning AuthenticatedMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -2464,9 +2452,9 @@ func (msg *AuthenticatedMessage) String() string {
 	buffer.WriteString(fmt.Sprintf("ConnectionId: %d", msg.connectionId))
 	buffer.WriteString(fmt.Sprintf(", ClientId: %s", msg.clientId))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -2489,7 +2477,7 @@ func (msg *AuthenticatedMessage) WriteHeader(os tgdb.TGOutputStream) tgdb.TGErro
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *AuthenticatedMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticatedMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering AuthenticatedMessage:ReadPayload"))
 	}
 
 	authToken, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -2498,7 +2486,7 @@ func (msg *AuthenticatedMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AuthenticatedMessage:ReadPayload read authToken as '%+v'", authToken))
+		logger.Debug(fmt.Sprintf("Inside AuthenticatedMessage:ReadPayload read authToken as '%+v'", authToken))
 	}
 
 	sessionId, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -2507,13 +2495,13 @@ func (msg *AuthenticatedMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read sessionId as '%+v'", sessionId))
+		logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read sessionId as '%+v'", sessionId))
 	}
 
 	msg.SetAuthToken(authToken)
 	msg.SetSessionId(sessionId)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AuthenticatedMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning AuthenticatedMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -2522,7 +2510,7 @@ func (msg *AuthenticatedMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError
 func (msg *AuthenticatedMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AuthenticatedMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering AuthenticatedMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 	if msg.GetAuthToken() == -1 || msg.GetSessionId() == -1 {
 		errMsg := fmt.Sprint("Message not authenticated")
@@ -2533,7 +2521,7 @@ func (msg *AuthenticatedMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGErr
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticatedMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning AuthenticatedMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -2572,8 +2560,6 @@ func (msg *AuthenticatedMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type DisconnectChannelRequestMessage struct {
 	*AuthenticatedMessage
 }
@@ -2608,7 +2594,7 @@ func NewDisconnectChannelRequestMessage(authToken, sessionId int64) *DisconnectC
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *DisconnectChannelRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DisconnectChannelRequestMessage:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering DisconnectChannelRequestMessage:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning DisconnectChannelRequestMessage:FromBytes w/ Error: Invalid Message Buffer"))
@@ -2624,7 +2610,7 @@ func (msg *DisconnectChannelRequestMessage) FromBytes(buffer []byte) (tgdb.TGMes
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside DisconnectChannelRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside DisconnectChannelRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -2632,7 +2618,7 @@ func (msg *DisconnectChannelRequestMessage) FromBytes(buffer []byte) (tgdb.TGMes
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -2641,7 +2627,7 @@ func (msg *DisconnectChannelRequestMessage) FromBytes(buffer []byte) (tgdb.TGMes
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -2650,7 +2636,7 @@ func (msg *DisconnectChannelRequestMessage) FromBytes(buffer []byte) (tgdb.TGMes
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning DisconnectChannelRequestMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning DisconnectChannelRequestMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -2658,12 +2644,12 @@ func (msg *DisconnectChannelRequestMessage) FromBytes(buffer []byte) (tgdb.TGMes
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *DisconnectChannelRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DisconnectChannelRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering DisconnectChannelRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -2672,7 +2658,7 @@ func (msg *DisconnectChannelRequestMessage) ToBytes() ([]byte, int, tgdb.TGError
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside DisconnectChannelRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -2686,7 +2672,7 @@ func (msg *DisconnectChannelRequestMessage) ToBytes() ([]byte, int, tgdb.TGError
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning DisconnectChannelRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning DisconnectChannelRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -2786,9 +2772,9 @@ func (msg *DisconnectChannelRequestMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("DisconnectChannelRequestMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -2811,7 +2797,7 @@ func (msg *DisconnectChannelRequestMessage) WriteHeader(os tgdb.TGOutputStream) 
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *DisconnectChannelRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DisconnectChannelRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering DisconnectChannelRequestMessage:ReadPayload"))
 	}
 	authToken, err := is.(*ProtocolDataInputStream).ReadLong()
 	if err != nil {
@@ -2819,7 +2805,7 @@ func (msg *DisconnectChannelRequestMessage) ReadPayload(is tgdb.TGInputStream) t
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("DisconnectChannelRequestMessage:ReadPayload read authToken as '%+v'", authToken))
+		logger.Debug(fmt.Sprintf("DisconnectChannelRequestMessage:ReadPayload read authToken as '%+v'", authToken))
 	}
 
 	sessionId, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -2828,12 +2814,12 @@ func (msg *DisconnectChannelRequestMessage) ReadPayload(is tgdb.TGInputStream) t
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("DisconnectChannelRequestMessage:ReadPayload read sessionId as '%+v'", sessionId))
+		logger.Debug(fmt.Sprintf("DisconnectChannelRequestMessage:ReadPayload read sessionId as '%+v'", sessionId))
 	}
 	msg.SetAuthToken(authToken)
 	msg.SetSessionId(sessionId)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning DisconnectChannelRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning DisconnectChannelRequestMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -2842,7 +2828,7 @@ func (msg *DisconnectChannelRequestMessage) ReadPayload(is tgdb.TGInputStream) t
 func (msg *DisconnectChannelRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering DisconnectChannelRequestMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering DisconnectChannelRequestMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 	if msg.GetAuthToken() == -1 || msg.GetSessionId() == -1 {
 		errMsg := fmt.Sprint("Message not authenticated")
@@ -2853,7 +2839,7 @@ func (msg *DisconnectChannelRequestMessage) WritePayload(os tgdb.TGOutputStream)
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning DisconnectChannelRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning DisconnectChannelRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -2891,15 +2877,13 @@ func (msg *DisconnectChannelRequestMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type AuthenticateRequestMessage struct {
 	*AbstractProtocolMessage
 	clientId  string
 	inboxAddr string
 	userName  string
 	password  []byte
-	dbName	string
+	dbName    string
 }
 
 func DefaultAuthenticateRequestMessage() *AuthenticateRequestMessage {
@@ -2972,7 +2956,7 @@ func (msg *AuthenticateRequestMessage) SetPassword(pwd []byte) {
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *AuthenticateRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticateRequestMessage:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering AuthenticateRequestMessage:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning AuthenticateRequestMessage:FromBytes w/ Error: Invalid Message Buffer"))
@@ -2988,7 +2972,7 @@ func (msg *AuthenticateRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage,
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -2996,7 +2980,7 @@ func (msg *AuthenticateRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage,
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -3005,7 +2989,7 @@ func (msg *AuthenticateRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage,
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -3014,7 +2998,7 @@ func (msg *AuthenticateRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage,
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticateRequestMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning AuthenticateRequestMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -3022,12 +3006,12 @@ func (msg *AuthenticateRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage,
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *AuthenticateRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticateRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering AuthenticateRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -3036,7 +3020,7 @@ func (msg *AuthenticateRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside AuthenticateRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -3050,7 +3034,7 @@ func (msg *AuthenticateRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticateRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning AuthenticateRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -3154,9 +3138,9 @@ func (msg *AuthenticateRequestMessage) String() string {
 	buffer.WriteString(fmt.Sprintf(", UserName: %s", msg.userName))
 	buffer.WriteString(fmt.Sprintf(", Password: %s", string(msg.password)))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -3179,7 +3163,7 @@ func (msg *AuthenticateRequestMessage) WriteHeader(os tgdb.TGOutputStream) tgdb.
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *AuthenticateRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticateRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering AuthenticateRequestMessage:ReadPayload"))
 	}
 	// For Testing purpose only.
 	bIsClientId, err := is.(*ProtocolDataInputStream).ReadBoolean()
@@ -3188,17 +3172,17 @@ func (msg *AuthenticateRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read bIsClientId as '%+v'", bIsClientId))
+		logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read bIsClientId as '%+v'", bIsClientId))
 	}
 	strClient := ""
-	if ! bIsClientId {
+	if !bIsClientId {
 		strClient, err = is.(*ProtocolDataInputStream).ReadUTF()
 		if err != nil {
 			logger.Error(fmt.Sprint("ERROR: Returning AuthenticateRequestMessage:ReadPayload w/ Error in reading clientId from message buffer"))
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read strClient as '%+v'", strClient))
+			logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read strClient as '%+v'", strClient))
 		}
 	}
 
@@ -3208,7 +3192,7 @@ func (msg *AuthenticateRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read inboxAddr as '%+v'", inboxAddr))
+		logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read inboxAddr as '%+v'", inboxAddr))
 	}
 
 	userName, err := is.(*ProtocolDataInputStream).ReadUTF()
@@ -3217,7 +3201,7 @@ func (msg *AuthenticateRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read userName as '%+v'", userName))
+		logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read userName as '%+v'", userName))
 	}
 
 	password, err := is.(*ProtocolDataInputStream).ReadBytes()
@@ -3226,7 +3210,7 @@ func (msg *AuthenticateRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read password as '%+v'", password))
+		logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read password as '%+v'", password))
 	}
 
 	msg.SetClientId(strClient)
@@ -3234,28 +3218,26 @@ func (msg *AuthenticateRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.T
 	msg.SetUserName(userName)
 	msg.SetPassword(password)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AuthenticateRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning AuthenticateRequestMessage:ReadPayload"))
 	}
 	return nil
 }
 
-
 //  SetDatabaseName sets the database-name on request message
-func (msg *AuthenticateRequestMessage) SetDatabaseName (dbname string) {
+func (msg *AuthenticateRequestMessage) SetDatabaseName(dbname string) {
 	msg.dbName = dbname
 }
 
 // GetDatabaseName gets the database-name from request message
-func (msg *AuthenticateRequestMessage) GetDatabaseName () string {
+func (msg *AuthenticateRequestMessage) GetDatabaseName() string {
 	return msg.dbName
 }
-
 
 // WritePayload exports the values of the message specific payload Attributes to output stream
 func (msg *AuthenticateRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AuthenticateRequestMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering AuthenticateRequestMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 
 	if msg.GetDatabaseName() == "" {
@@ -3295,12 +3277,11 @@ func (msg *AuthenticateRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb
 	//Currently set to use all roles
 	os.(*ProtocolDataOutputStream).WriteInt(-1)
 
-
 	if msg.GetUserName() == "" {
 		os.(*ProtocolDataOutputStream).WriteBoolean(true)
 	} else {
 		os.(*ProtocolDataOutputStream).WriteBoolean(false)
-		err := os.(*ProtocolDataOutputStream).WriteUTF(msg.GetUserName())	// Can't be null.
+		err := os.(*ProtocolDataOutputStream).WriteUTF(msg.GetUserName()) // Can't be null.
 		if err != nil {
 			logger.Error(fmt.Sprint("ERROR: Returning AuthenticateRequestMessage:WritePayload w/ Error in writing userName to message buffer"))
 			return err
@@ -3313,7 +3294,7 @@ func (msg *AuthenticateRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticateRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning AuthenticateRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return os.(*ProtocolDataOutputStream).WriteBytes(msg.GetPassword())
 }
@@ -3352,8 +3333,6 @@ func (msg *AuthenticateRequestMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type AuthenticateResponseMessage struct {
 	*AbstractProtocolMessage
@@ -3419,7 +3398,7 @@ func (msg *AuthenticateResponseMessage) SetSuccess(flag bool) {
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *AuthenticateResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticateResponseMessage:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering AuthenticateResponseMessage:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning AuthenticateResponseMessage:FromBytes w/ Error: Invalid Message Buffer"))
@@ -3452,7 +3431,7 @@ func (msg *AuthenticateResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticateResponseMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside AuthenticateResponseMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -3461,7 +3440,7 @@ func (msg *AuthenticateResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticateResponseMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning AuthenticateResponseMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -3469,12 +3448,12 @@ func (msg *AuthenticateResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *AuthenticateResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticateResponseMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering AuthenticateResponseMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticateResponseMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside AuthenticateResponseMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -3483,7 +3462,7 @@ func (msg *AuthenticateResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AuthenticateResponseMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside AuthenticateResponseMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -3497,7 +3476,7 @@ func (msg *AuthenticateResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticateResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning AuthenticateResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -3600,9 +3579,9 @@ func (msg *AuthenticateResponseMessage) String() string {
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
 	buffer.WriteString(fmt.Sprintf(", ErrorStatus: %+v", msg.errorStatus))
 	//buffer.WriteString(fmt.Sprintf(", ServerCertBuffer: %+v", msg.serverCertBuffer))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -3625,7 +3604,7 @@ func (msg *AuthenticateResponseMessage) WriteHeader(os tgdb.TGOutputStream) tgdb
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AuthenticateResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering AuthenticateResponseMessage:ReadPayload"))
 	}
 	bSuccess, err := is.(*ProtocolDataInputStream).ReadBoolean()
 	if err != nil {
@@ -3633,7 +3612,7 @@ func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read bSuccess as '%+v'", bSuccess))
+		logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read bSuccess as '%+v'", bSuccess))
 	}
 
 	if !bSuccess {
@@ -3643,7 +3622,7 @@ func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read errorStatus as '%+v'", errorStatus))
+			logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read errorStatus as '%+v'", errorStatus))
 		}
 		msg.SetErrorStatus(errorStatus)
 	}
@@ -3654,7 +3633,7 @@ func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read authToken as '%+v'", authToken))
+		logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read authToken as '%+v'", authToken))
 	}
 
 	sessionId, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -3663,7 +3642,7 @@ func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read sessionId as '%+v'", sessionId))
+		logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read sessionId as '%+v'", sessionId))
 	}
 
 	certBuffer, err := is.(*ProtocolDataInputStream).ReadBytes()
@@ -3672,7 +3651,7 @@ func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read certBuffer as '%+v'", certBuffer))
+		logger.Debug(fmt.Sprintf("AuthenticateResponseMessage:ReadPayload read certBuffer as '%+v'", certBuffer))
 	}
 
 	msg.SetSuccess(bSuccess)
@@ -3680,7 +3659,7 @@ func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.
 	msg.SetSessionId(sessionId)
 	msg.SetServerCertBuffer(certBuffer)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AuthenticateResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning AuthenticateResponseMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -3689,7 +3668,7 @@ func (msg *AuthenticateResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.
 func (msg *AuthenticateResponseMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AuthenticateResponseMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering AuthenticateResponseMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 	os.(*ProtocolDataOutputStream).WriteBoolean(msg.IsSuccess())
 	os.(*ProtocolDataOutputStream).WriteLong(msg.GetAuthToken())
@@ -3697,7 +3676,7 @@ func (msg *AuthenticateResponseMessage) WritePayload(os tgdb.TGOutputStream) tgd
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AuthenticateResponseMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning AuthenticateResponseMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -3736,8 +3715,6 @@ func (msg *AuthenticateResponseMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type BeginTransactionRequestMessage struct {
 	*AbstractProtocolMessage
 }
@@ -3772,7 +3749,7 @@ func NewBeginTransactionRequestMessage(authToken, sessionId int64) *BeginTransac
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *BeginTransactionRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering BeginTransactionRequestMessage:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering BeginTransactionRequestMessage:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning BeginTransactionRequestMessage:FromBytes w/ Error: Invalid Message Buffer"))
@@ -3788,7 +3765,7 @@ func (msg *BeginTransactionRequestMessage) FromBytes(buffer []byte) (tgdb.TGMess
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside BeginTransactionRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside BeginTransactionRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -3796,7 +3773,7 @@ func (msg *BeginTransactionRequestMessage) FromBytes(buffer []byte) (tgdb.TGMess
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -3805,7 +3782,7 @@ func (msg *BeginTransactionRequestMessage) FromBytes(buffer []byte) (tgdb.TGMess
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -3814,7 +3791,7 @@ func (msg *BeginTransactionRequestMessage) FromBytes(buffer []byte) (tgdb.TGMess
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning BeginTransactionRequestMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning BeginTransactionRequestMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -3822,12 +3799,12 @@ func (msg *BeginTransactionRequestMessage) FromBytes(buffer []byte) (tgdb.TGMess
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *BeginTransactionRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering BeginTransactionRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering BeginTransactionRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -3836,7 +3813,7 @@ func (msg *BeginTransactionRequestMessage) ToBytes() ([]byte, int, tgdb.TGError)
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -3850,7 +3827,7 @@ func (msg *BeginTransactionRequestMessage) ToBytes() ([]byte, int, tgdb.TGError)
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning BeginTransactionRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning BeginTransactionRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -3950,9 +3927,9 @@ func (msg *BeginTransactionRequestMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("BeginTransactionRequestMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -4016,8 +3993,6 @@ func (msg *BeginTransactionRequestMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type BeginTransactionResponseMessage struct {
 	*AbstractProtocolMessage
@@ -4083,7 +4058,7 @@ func (msg *BeginTransactionResponseMessage) FromBytes(buffer []byte) (tgdb.TGMes
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside BeginTransactionResponseMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside BeginTransactionResponseMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -4091,7 +4066,7 @@ func (msg *BeginTransactionResponseMessage) FromBytes(buffer []byte) (tgdb.TGMes
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -4100,7 +4075,7 @@ func (msg *BeginTransactionResponseMessage) FromBytes(buffer []byte) (tgdb.TGMes
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -4109,7 +4084,7 @@ func (msg *BeginTransactionResponseMessage) FromBytes(buffer []byte) (tgdb.TGMes
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning BeginTransactionResponseMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning BeginTransactionResponseMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -4117,12 +4092,12 @@ func (msg *BeginTransactionResponseMessage) FromBytes(buffer []byte) (tgdb.TGMes
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *BeginTransactionResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering BeginTransactionResponseMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering BeginTransactionResponseMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -4131,7 +4106,7 @@ func (msg *BeginTransactionResponseMessage) ToBytes() ([]byte, int, tgdb.TGError
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside BeginTransactionResponseMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -4145,7 +4120,7 @@ func (msg *BeginTransactionResponseMessage) ToBytes() ([]byte, int, tgdb.TGError
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning BeginTransactionResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning BeginTransactionResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -4246,9 +4221,9 @@ func (msg *BeginTransactionResponseMessage) String() string {
 	buffer.WriteString("BeginTransactionResponseMessage:{")
 	buffer.WriteString(fmt.Sprintf("ClientId: %d", msg.transactionId))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -4271,7 +4246,7 @@ func (msg *BeginTransactionResponseMessage) WriteHeader(os tgdb.TGOutputStream) 
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *BeginTransactionResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering BeginTransactionResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering BeginTransactionResponseMessage:ReadPayload"))
 	}
 	txnId, err := is.(*ProtocolDataInputStream).ReadLong()
 	if err != nil {
@@ -4279,11 +4254,11 @@ func (msg *BeginTransactionResponseMessage) ReadPayload(is tgdb.TGInputStream) t
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read txnId as '%+v'", txnId))
+		logger.Debug(fmt.Sprintf("Inside AuthenticateRequestMessage:ReadPayload read txnId as '%+v'", txnId))
 	}
 	msg.SetTransactionId(txnId)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning BeginTransactionResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning BeginTransactionResponseMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -4292,13 +4267,13 @@ func (msg *BeginTransactionResponseMessage) ReadPayload(is tgdb.TGInputStream) t
 func (msg *BeginTransactionResponseMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering BeginTransactionResponseMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering BeginTransactionResponseMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 	os.(*ProtocolDataOutputStream).WriteLong(msg.GetTransactionId())
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning BeginTransactionResponseMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning BeginTransactionResponseMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -4335,8 +4310,6 @@ func (msg *BeginTransactionResponseMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type CommitTransactionRequest struct {
 	*AbstractProtocolMessage
@@ -4416,7 +4389,7 @@ func (msg *CommitTransactionRequest) GetAttrDescSet() []tgdb.TGAttributeDescript
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *CommitTransactionRequest) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering CommitTransactionRequest:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering CommitTransactionRequest:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning CommitTransactionRequest:FromBytes w/ Error: Invalid Message Buffer"))
@@ -4458,7 +4431,7 @@ func (msg *CommitTransactionRequest) FromBytes(buffer []byte) (tgdb.TGMessage, t
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning CommitTransactionRequest::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning CommitTransactionRequest::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -4466,12 +4439,12 @@ func (msg *CommitTransactionRequest) FromBytes(buffer []byte) (tgdb.TGMessage, t
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *CommitTransactionRequest) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering CommitTransactionRequest::ToBytes"))
+		logger.Debug(fmt.Sprint("Entering CommitTransactionRequest::ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside CommitTransactionRequest:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside CommitTransactionRequest:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -4480,7 +4453,7 @@ func (msg *CommitTransactionRequest) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside CommitTransactionRequest:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside CommitTransactionRequest:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -4494,7 +4467,7 @@ func (msg *CommitTransactionRequest) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning CommitTransactionRequest::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()[:os.GetLength()]))
+		logger.Debug(fmt.Sprintf("Returning CommitTransactionRequest::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()[:os.GetLength()]))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -4615,9 +4588,9 @@ func (msg *CommitTransactionRequest) String() string {
 	}
 	buffer.WriteString("}")
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -4648,7 +4621,7 @@ func (msg *CommitTransactionRequest) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 func (msg *CommitTransactionRequest) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering CommitTransactionRequest:ReadPayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering CommitTransactionRequest:ReadPayload at output buffer position: '%d'", startPos))
 	}
 	os.(*ProtocolDataOutputStream).WriteInt(0) // This is for the commit buffer length
 	os.(*ProtocolDataOutputStream).WriteInt(0) // This is for the checksum for the commit buffer to be added later.  Currently not used
@@ -4666,7 +4639,7 @@ func (msg *CommitTransactionRequest) WritePayload(os tgdb.TGOutputStream) tgdb.T
 			}
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:ReadPayload - There are '%d' new attribute descriptors", newAttrCount))
+			logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:ReadPayload - There are '%d' new attribute descriptors", newAttrCount))
 		}
 		os.(*ProtocolDataOutputStream).WriteInt(newAttrCount)
 		for _, attrDesc := range msg.attrDescSet {
@@ -4678,7 +4651,7 @@ func (msg *CommitTransactionRequest) WritePayload(os tgdb.TGOutputStream) tgdb.T
 			//}
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:ReadPayload - '%d' attribute descriptors are written in byte format", len(msg.attrDescSet)))
+			logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:ReadPayload - '%d' attribute descriptors are written in byte format", len(msg.attrDescSet)))
 		}
 	}
 	if len(msg.addedList) > 0 {
@@ -4692,7 +4665,7 @@ func (msg *CommitTransactionRequest) WritePayload(os tgdb.TGOutputStream) tgdb.T
 			}
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:WritePayload - '%d' new entities are written in byte format", len(msg.addedList)))
+			logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:WritePayload - '%d' new entities are written in byte format", len(msg.addedList)))
 		}
 	}
 	//TODO: Ask TGDB Engineering Team - Need to write only the modified Attributes
@@ -4707,7 +4680,7 @@ func (msg *CommitTransactionRequest) WritePayload(os tgdb.TGOutputStream) tgdb.T
 			}
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:WritePayload - '%d' updateable entities are written in byte format", len(msg.updatedList)))
+			logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:WritePayload - '%d' updateable entities are written in byte format", len(msg.updatedList)))
 		}
 	}
 	//TODO: Ask TGDB Engineering Team - Need to write the id only
@@ -4722,7 +4695,7 @@ func (msg *CommitTransactionRequest) WritePayload(os tgdb.TGOutputStream) tgdb.T
 			}
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:WritePayload - '%d' removable entities are written in byte format", len(msg.removedList)))
+			logger.Debug(fmt.Sprintf("Inside CommitTransactionRequest:WritePayload - '%d' removable entities are written in byte format", len(msg.removedList)))
 		}
 	}
 	currPos := os.GetPosition()
@@ -4732,7 +4705,7 @@ func (msg *CommitTransactionRequest) WritePayload(os tgdb.TGOutputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning CommitTransactionRequest::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning CommitTransactionRequest::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -4771,8 +4744,6 @@ func (msg *CommitTransactionRequest) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type CommitTransactionResponse struct {
 	*AbstractProtocolMessage
@@ -4830,18 +4801,18 @@ func NewCommitTransactionResponseMessage(authToken, sessionId int64) *CommitTran
 func ProcessTransactionStatus(is tgdb.TGInputStream, status int) *TransactionException {
 	txnStatus := tgdb.FromStatus(status)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering CommitTransactionResponse:ProcessTransactionStatus read txnStatus as '%d'", txnStatus))
+		logger.Debug(fmt.Sprintf("Entering CommitTransactionResponse:ProcessTransactionStatus read txnStatus as '%d'", txnStatus))
 	}
 	if txnStatus == tgdb.TGTransactionSuccess {
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse:ProcessTransactionStatus NO EXCEPTION for txnStatus:'%+v'", txnStatus))
+			logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse:ProcessTransactionStatus NO EXCEPTION for txnStatus:'%+v'", txnStatus))
 		}
 		return nil
 	}
 	switch txnStatus {
 	case tgdb.TGTransactionSuccess:
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse:ProcessTransactionStatus NO EXCEPTION for txnStatus:'%+v'", txnStatus))
+			logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse:ProcessTransactionStatus NO EXCEPTION for txnStatus:'%+v'", txnStatus))
 		}
 		return nil
 	case tgdb.TGTransactionAlreadyInProgress:
@@ -4955,7 +4926,7 @@ func (msg *CommitTransactionResponse) SetRemovedIdList(list []int64) {
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *CommitTransactionResponse) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering CommitTransactionResponse:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering CommitTransactionResponse:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning CommitTransactionResponse:FromBytes w/ Error: Invalid Message Buffer"))
@@ -4979,7 +4950,7 @@ func (msg *CommitTransactionResponse) FromBytes(buffer []byte) (tgdb.TGMessage, 
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -4989,7 +4960,7 @@ func (msg *CommitTransactionResponse) FromBytes(buffer []byte) (tgdb.TGMessage, 
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -4999,7 +4970,7 @@ func (msg *CommitTransactionResponse) FromBytes(buffer []byte) (tgdb.TGMessage, 
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -5007,12 +4978,12 @@ func (msg *CommitTransactionResponse) FromBytes(buffer []byte) (tgdb.TGMessage, 
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *CommitTransactionResponse) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering CommitTransactionResponse:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering CommitTransactionResponse:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -5021,7 +4992,7 @@ func (msg *CommitTransactionResponse) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside CommitTransactionResponse:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -5035,7 +5006,7 @@ func (msg *CommitTransactionResponse) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning CommitTransactionResponse::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -5159,9 +5130,9 @@ func (msg *CommitTransactionResponse) String() string {
 	}
 	buffer.WriteString("}")
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -5184,7 +5155,7 @@ func (msg *CommitTransactionResponse) WriteHeader(os tgdb.TGOutputStream) tgdb.T
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering CommitTransactionResponse:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering CommitTransactionResponse:ReadPayload"))
 	}
 	bLen, err := is.(*ProtocolDataInputStream).ReadInt() // buf length
 	if err != nil {
@@ -5192,7 +5163,7 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read buf length as '%+v'", bLen))
+		logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read buf length as '%+v'", bLen))
 	}
 
 	checkSum, err := is.(*ProtocolDataInputStream).ReadInt() // checksum
@@ -5201,7 +5172,7 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read checkSum as '%+v'", checkSum))
+		logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read checkSum as '%+v'", checkSum))
 	}
 
 	status, err := is.(*ProtocolDataInputStream).ReadInt() // status code - currently zero
@@ -5210,11 +5181,11 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read status as '%+v'", status))
+		logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read status as '%+v'", status))
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload - about to ProcessTransactionStatus for status '%+v'", status))
+		logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload - about to ProcessTransactionStatus for status '%+v'", status))
 	}
 	txnException := ProcessTransactionStatus(is, status)
 	if txnException != nil {
@@ -5232,7 +5203,7 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 			break
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read avail as '%+v'", avail))
+			logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read avail as '%+v'", avail))
 		}
 
 		opCode, err := is.(*ProtocolDataInputStream).ReadShort()
@@ -5241,7 +5212,7 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read opCode as '%+v'", opCode))
+			logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read opCode as '%+v'", opCode))
 		}
 
 		switch opCode {
@@ -5253,17 +5224,17 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 			}
 			msg.attrDescCount = attrDescCount
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read attrDescCount for opCode=0x1010 as '%+v'", attrDescCount))
+				logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read attrDescCount for opCode=0x1010 as '%+v'", attrDescCount))
 			}
 			for i := 0; i < attrDescCount; i++ {
 				tempId, _ := is.(*ProtocolDataInputStream).ReadInt()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read tempId for opCode=0x1010 as '%+v'", tempId))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read tempId for opCode=0x1010 as '%+v'", tempId))
 				}
 				msg.attrDescIdList = append(msg.attrDescIdList, int64(tempId))
 				realId, _ := is.(*ProtocolDataInputStream).ReadInt()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read realId for opCode=0x1010 as '%+v'", realId))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read realId for opCode=0x1010 as '%+v'", realId))
 				}
 				msg.attrDescIdList = append(msg.attrDescIdList, int64(realId))
 			}
@@ -5276,22 +5247,22 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 			}
 			msg.addedCount = addedCount
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read addedCount for opCode=0x1011 as '%+v'", addedCount))
+				logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read addedCount for opCode=0x1011 as '%+v'", addedCount))
 			}
 			for i := 0; i < addedCount; i++ {
 				longTempId, _ := is.(*ProtocolDataInputStream).ReadLong()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read longTempId for opCode=0x1011 as '%+v'", longTempId))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read longTempId for opCode=0x1011 as '%+v'", longTempId))
 				}
 				msg.addedIdList = append(msg.addedIdList, longTempId)
 				longRealId, _ := is.(*ProtocolDataInputStream).ReadLong()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read longRealId for opCode=0x1011 as '%+v'", longRealId))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read longRealId for opCode=0x1011 as '%+v'", longRealId))
 				}
 				msg.addedIdList = append(msg.addedIdList, longRealId)
 				longVersion, _ := is.(*ProtocolDataInputStream).ReadLong()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read longVersion for opCode=0x1011 as '%+v'", longVersion))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read longVersion for opCode=0x1011 as '%+v'", longVersion))
 				}
 				msg.addedIdList = append(msg.addedIdList, longVersion)
 			}
@@ -5304,17 +5275,17 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 			}
 			msg.updatedCount = updatedCount
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read updatedCount for opCode=0x1012 as '%+v'", updatedCount))
+				logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read updatedCount for opCode=0x1012 as '%+v'", updatedCount))
 			}
 			for i := 0; i < updatedCount; i++ {
 				id, _ := is.(*ProtocolDataInputStream).ReadLong()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read id for opCode=0x1012 as '%+v'", id))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read id for opCode=0x1012 as '%+v'", id))
 				}
 				msg.updatedIdList = append(msg.updatedIdList, id)
 				version, _ := is.(*ProtocolDataInputStream).ReadLong()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read version for opCode=0x1012 as '%+v'", version))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read version for opCode=0x1012 as '%+v'", version))
 				}
 				msg.updatedIdList = append(msg.updatedIdList, version)
 			}
@@ -5327,12 +5298,12 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 			}
 			msg.removedCount = removedCount
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read removedCount for opCode=0x1013 as '%+v'", removedCount))
+				logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read removedCount for opCode=0x1013 as '%+v'", removedCount))
 			}
 			for i := 0; i < removedCount; i++ {
 				id, _ := is.(*ProtocolDataInputStream).ReadLong()
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read id for opCode=0x1013 as '%+v'", id))
+					logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read id for opCode=0x1013 as '%+v'", id))
 				}
 				msg.removedIdList = append(msg.removedIdList, id)
 			}
@@ -5341,7 +5312,7 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 			msg.entityStream = is
 			pos := is.(*ProtocolDataInputStream).GetPosition()
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read pos for opCode=0x6789 as '%+v'", pos))
+				logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read pos for opCode=0x6789 as '%+v'", pos))
 			}
 			count, err := is.(*ProtocolDataInputStream).ReadInt()
 			if err != nil {
@@ -5349,7 +5320,7 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 				return err
 			}
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read count for opCode=0x6789 as '%+v'", count))
+				logger.Debug(fmt.Sprintf("Inside CommitTransactionResponse:ReadPayload read count for opCode=0x6789 as '%+v'", count))
 			}
 			is.(*ProtocolDataInputStream).SetPosition(pos)
 			break
@@ -5358,7 +5329,7 @@ func (msg *CommitTransactionResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TG
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning CommitTransactionResponse:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning CommitTransactionResponse:ReadPayload"))
 	}
 	return nil
 }
@@ -5405,8 +5376,6 @@ func (msg *CommitTransactionResponse) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type DecryptBufferRequestMessage struct {
 	*AbstractProtocolMessage
@@ -5471,7 +5440,7 @@ func (msg *DecryptBufferRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside DecryptBufferRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside DecryptBufferRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -5497,7 +5466,7 @@ func (msg *DecryptBufferRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning DecryptBufferRequestMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning DecryptBufferRequestMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -5505,12 +5474,12 @@ func (msg *DecryptBufferRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *DecryptBufferRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DecryptBufferRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering DecryptBufferRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DecryptBufferRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside DecryptBufferRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -5519,7 +5488,7 @@ func (msg *DecryptBufferRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DecryptBufferRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside DecryptBufferRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -5533,7 +5502,7 @@ func (msg *DecryptBufferRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning DecryptBufferRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning DecryptBufferRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -5633,9 +5602,9 @@ func (msg *DecryptBufferRequestMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("DecryptBufferRequestMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -5702,8 +5671,6 @@ func (msg *DecryptBufferRequestMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type DecryptBufferResponseMessage struct {
 	*AbstractProtocolMessage
@@ -5802,12 +5769,12 @@ func (msg *DecryptBufferResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *DecryptBufferResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DecryptBufferResponseMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering DecryptBufferResponseMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DecryptBufferResponseMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside DecryptBufferResponseMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -5816,7 +5783,7 @@ func (msg *DecryptBufferResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DecryptBufferResponseMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside DecryptBufferResponseMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -5830,7 +5797,7 @@ func (msg *DecryptBufferResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning DecryptBufferResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning DecryptBufferResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -5930,9 +5897,9 @@ func (msg *DecryptBufferResponseMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("DecryptBufferResponseMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -5955,7 +5922,7 @@ func (msg *DecryptBufferResponseMessage) WriteHeader(os tgdb.TGOutputStream) tgd
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *DecryptBufferResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DecryptBufferResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering DecryptBufferResponseMessage:ReadPayload"))
 	}
 	decryptBuffer, err := is.(*ProtocolDataInputStream).ReadBytes()
 	if err != nil {
@@ -5965,7 +5932,7 @@ func (msg *DecryptBufferResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb
 	//logger.Debug(fmt.Sprintf("DecryptBufferResponseMessage:ReadPayload read decryptBuffer as '%+v'", decryptBuffer))
 	msg.SetDecryptedBuffer(decryptBuffer)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning DecryptBufferResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning DecryptBufferResponseMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -6009,7 +5976,6 @@ func (msg *DecryptBufferResponseMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 type DumpStacktraceRequestMessage struct {
 	*AbstractProtocolMessage
 }
@@ -6044,7 +6010,7 @@ func NewDumpStacktraceRequestMessage(authToken, sessionId int64) *DumpStacktrace
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *DumpStacktraceRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DumpStacktraceRequest:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering DumpStacktraceRequest:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning DumpStacktraceRequest:FromBytes w/ Error: Invalid Message Buffer"))
@@ -6060,7 +6026,7 @@ func (msg *DumpStacktraceRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside DumpStacktraceRequest:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside DumpStacktraceRequest:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -6068,7 +6034,7 @@ func (msg *DumpStacktraceRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DumpStacktraceRequest:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside DumpStacktraceRequest:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -6094,12 +6060,12 @@ func (msg *DumpStacktraceRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *DumpStacktraceRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering DumpStacktraceRequest:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering DumpStacktraceRequest:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DumpStacktraceRequest:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside DumpStacktraceRequest:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -6108,7 +6074,7 @@ func (msg *DumpStacktraceRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside DumpStacktraceRequest:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside DumpStacktraceRequest:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -6122,7 +6088,7 @@ func (msg *DumpStacktraceRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("DumpStacktraceRequest::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("DumpStacktraceRequest::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -6222,9 +6188,9 @@ func (msg *DumpStacktraceRequestMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("DumpStacktraceRequest:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -6289,10 +6255,9 @@ func (msg *DumpStacktraceRequestMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 type ExceptionMessage struct {
 	*AbstractProtocolMessage
-	servercode int
+	servercode    int
 	exceptionMsg  string
 	exceptionType int
 }
@@ -6368,7 +6333,6 @@ func (msg *ExceptionMessage) SetServerErrorCode(sCode int) {
 	msg.servercode = sCode
 }
 
-
 /////////////////////////////////////////////////////////////////
 // Implement functions from Interface ==> TGMessage
 /////////////////////////////////////////////////////////////////
@@ -6400,7 +6364,7 @@ func (msg *ExceptionMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGEr
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside ExceptionMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside ExceptionMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -6409,7 +6373,7 @@ func (msg *ExceptionMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGEr
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside ExceptionMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside ExceptionMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -6426,12 +6390,12 @@ func (msg *ExceptionMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGEr
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *ExceptionMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering ExceptionMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering ExceptionMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside ExceptionMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside ExceptionMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -6440,7 +6404,7 @@ func (msg *ExceptionMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside ExceptionMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside ExceptionMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -6454,7 +6418,7 @@ func (msg *ExceptionMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("ExceptionMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("ExceptionMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -6556,9 +6520,9 @@ func (msg *ExceptionMessage) String() string {
 	buffer.WriteString(fmt.Sprintf("ExceptionMsg: %s", msg.exceptionMsg))
 	buffer.WriteString(fmt.Sprintf(", ExceptionType: %d", msg.exceptionType))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -6578,14 +6542,14 @@ func (msg *ExceptionMessage) WriteHeader(os tgdb.TGOutputStream) tgdb.TGError {
 	return APMWriteHeader(msg, os)
 }
 
-func (msg *ExceptionMessage) mapServerCodeToExceptionType () {
+func (msg *ExceptionMessage) mapServerCodeToExceptionType() {
 	// TODO
 }
 
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *ExceptionMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering ExceptionMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering ExceptionMessage:ReadPayload"))
 	}
 	sCode, err := is.(*ProtocolDataInputStream).ReadInt()
 	if err != nil {
@@ -6610,7 +6574,7 @@ func (msg *ExceptionMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	msg.mapServerCodeToExceptionType()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning ExceptionMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning ExceptionMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -6654,7 +6618,6 @@ func (msg *ExceptionMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 type GetEntityRequestMessage struct {
 	*AbstractProtocolMessage
@@ -6794,7 +6757,7 @@ func (msg *GetEntityRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetEntityRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside GetEntityRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -6820,7 +6783,7 @@ func (msg *GetEntityRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning GetEntityRequestMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning GetEntityRequestMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -6828,12 +6791,12 @@ func (msg *GetEntityRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *GetEntityRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering GetEntityRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering GetEntityRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetEntityRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside GetEntityRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -6842,7 +6805,7 @@ func (msg *GetEntityRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetEntityRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside GetEntityRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -6856,7 +6819,7 @@ func (msg *GetEntityRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning GetEntityRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning GetEntityRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -6962,9 +6925,9 @@ func (msg *GetEntityRequestMessage) String() string {
 	buffer.WriteString(fmt.Sprintf(", EdgeLimit: %d", msg.edgeLimit))
 	buffer.WriteString(fmt.Sprintf(", ResultId: %d", msg.resultId))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -7061,7 +7024,6 @@ func (msg *GetEntityRequestMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 type GetEntityResponseMessage struct {
 	*AbstractProtocolMessage
@@ -7174,7 +7136,7 @@ func (msg *GetEntityResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -7183,7 +7145,7 @@ func (msg *GetEntityResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -7200,12 +7162,12 @@ func (msg *GetEntityResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *GetEntityResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering GetEntityResponseMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering GetEntityResponseMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -7214,7 +7176,7 @@ func (msg *GetEntityResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside GetEntityResponseMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -7228,7 +7190,7 @@ func (msg *GetEntityResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning GetEntityResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning GetEntityResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -7333,9 +7295,9 @@ func (msg *GetEntityResponseMessage) String() string {
 	buffer.WriteString(fmt.Sprintf(", ResultCount: %d", msg.resultCount))
 	//buffer.WriteString(fmt.Sprintf(", EntityStream: %+v", msg.entityStream))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -7358,7 +7320,7 @@ func (msg *GetEntityResponseMessage) WriteHeader(os tgdb.TGOutputStream) tgdb.TG
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *GetEntityResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering GetEntityResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering GetEntityResponseMessage:ReadPayload"))
 	}
 	avail, err := is.(*ProtocolDataInputStream).Available()
 	if err != nil {
@@ -7366,7 +7328,7 @@ func (msg *GetEntityResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetEntityResponseMessage:ReadPayload read avail as '%+v'", avail))
+		logger.Debug(fmt.Sprintf("Inside GetEntityResponseMessage:ReadPayload read avail as '%+v'", avail))
 	}
 	if avail == 0 {
 		errMsg := fmt.Sprint("Get entity response has no data")
@@ -7381,7 +7343,7 @@ func (msg *GetEntityResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetEntityResponseMessage:ReadPayload read resultId as '%+v'", resultId))
+		logger.Debug(fmt.Sprintf("Inside GetEntityResponseMessage:ReadPayload read resultId as '%+v'", resultId))
 	}
 
 	pos := is.(*ProtocolDataInputStream).GetPosition()
@@ -7395,7 +7357,7 @@ func (msg *GetEntityResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 		msg.SetHasResult(true)
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetEntityResponseMessage:ReadPayload read totCount as '%+v'", totCount))
+		logger.Debug(fmt.Sprintf("Inside GetEntityResponseMessage:ReadPayload read totCount as '%+v'", totCount))
 	}
 
 	is.(*ProtocolDataInputStream).SetPosition(pos)
@@ -7403,7 +7365,7 @@ func (msg *GetEntityResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 	msg.SetResultId(resultId)
 	msg.SetTotalCount(totCount)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning GetEntityResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning GetEntityResponseMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -7447,8 +7409,6 @@ func (msg *GetEntityResponseMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type GetLargeObjectRequestMessage struct {
 	*AbstractProtocolMessage
@@ -7524,7 +7484,7 @@ func (msg *GetLargeObjectRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetLargeObjectRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside GetLargeObjectRequestMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -7532,7 +7492,7 @@ func (msg *GetLargeObjectRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -7541,7 +7501,7 @@ func (msg *GetLargeObjectRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -7558,12 +7518,12 @@ func (msg *GetLargeObjectRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessag
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *GetLargeObjectRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering GetLargeObjectRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering GetLargeObjectRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -7572,7 +7532,7 @@ func (msg *GetLargeObjectRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside GetLargeObjectRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -7586,7 +7546,7 @@ func (msg *GetLargeObjectRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("GetLargeObjectRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("GetLargeObjectRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -7713,7 +7673,7 @@ func (msg *GetLargeObjectRequestMessage) WriteHeader(os tgdb.TGOutputStream) tgd
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *GetLargeObjectRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering GetLargeObjectRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering GetLargeObjectRequestMessage:ReadPayload"))
 	}
 	entityId, err := is.(*ProtocolDataInputStream).ReadLong()
 	if err != nil {
@@ -7721,11 +7681,11 @@ func (msg *GetLargeObjectRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetLargeObjectRequestMessage:ReadPayload read entityId as '%+v'", entityId))
+		logger.Debug(fmt.Sprintf("Inside GetLargeObjectRequestMessage:ReadPayload read entityId as '%+v'", entityId))
 	}
 	msg.SetEntityId(entityId)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning GetLargeObjectRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning GetLargeObjectRequestMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -7734,14 +7694,14 @@ func (msg *GetLargeObjectRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb
 func (msg *GetLargeObjectRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering GetLargeObjectRequestMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering GetLargeObjectRequestMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 	os.(*ProtocolDataOutputStream).WriteLong(msg.GetEntityId())
 	os.(*ProtocolDataOutputStream).WriteBoolean(msg.GetDecryptFlag())
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning GetLargeObjectRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning GetLargeObjectRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -7779,8 +7739,6 @@ func (msg *GetLargeObjectRequestMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type GetLargeObjectResponseMessage struct {
 	*AbstractProtocolMessage
@@ -7853,7 +7811,7 @@ func (msg *GetLargeObjectResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessa
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -7861,7 +7819,7 @@ func (msg *GetLargeObjectResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessa
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetLargeObjectResponseMessage:FromBytes - about to APMReadHeader"))
+		logger.Debug(fmt.Sprint("Inside GetLargeObjectResponseMessage:FromBytes - about to APMReadHeader"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -7879,7 +7837,7 @@ func (msg *GetLargeObjectResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessa
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning GetLargeObjectResponseMessage::FromBytes results in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning GetLargeObjectResponseMessage::FromBytes results in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -7887,12 +7845,12 @@ func (msg *GetLargeObjectResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessa
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *GetLargeObjectResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering GetLargeObjectResponseMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering GetLargeObjectResponseMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetLargeObjectResponseMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside GetLargeObjectResponseMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -7901,7 +7859,7 @@ func (msg *GetLargeObjectResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) 
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside GetLargeObjectResponseMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside GetLargeObjectResponseMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -7915,7 +7873,7 @@ func (msg *GetLargeObjectResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) 
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning GetLargeObjectResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning GetLargeObjectResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -8017,9 +7975,9 @@ func (msg *GetLargeObjectResponseMessage) String() string {
 	buffer.WriteString(fmt.Sprintf("EntityId: %d", msg.entityId))
 	buffer.WriteString(fmt.Sprintf(", BoStream: %s", msg.boStream.String()))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -8042,7 +8000,7 @@ func (msg *GetLargeObjectResponseMessage) WriteHeader(os tgdb.TGOutputStream) tg
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *GetLargeObjectResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering GetLargeObjectResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering GetLargeObjectResponseMessage:ReadPayload"))
 	}
 	status, err := is.(*ProtocolDataInputStream).ReadInt()
 	if err != nil {
@@ -8050,7 +8008,7 @@ func (msg *GetLargeObjectResponseMessage) ReadPayload(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read status as '%+v'", status))
+		logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read status as '%+v'", status))
 	}
 	if status > 0 {
 		errMsg := fmt.Sprintf("Read Large Object failed with status: %d", status)
@@ -8064,7 +8022,7 @@ func (msg *GetLargeObjectResponseMessage) ReadPayload(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read entityId as '%+v'", entityId))
+		logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read entityId as '%+v'", entityId))
 	}
 
 	bHasData, err := is.(*ProtocolDataInputStream).ReadBoolean()
@@ -8073,7 +8031,7 @@ func (msg *GetLargeObjectResponseMessage) ReadPayload(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read bHasData as '%+v'", bHasData))
+		logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read bHasData as '%+v'", bHasData))
 	}
 	if bHasData {
 		numChunks, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -8082,7 +8040,7 @@ func (msg *GetLargeObjectResponseMessage) ReadPayload(is tgdb.TGInputStream) tgd
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read numChunks as '%+v'", numChunks))
+			logger.Debug(fmt.Sprintf("Inside GetLargeObjectResponseMessage:ReadPayload read numChunks as '%+v'", numChunks))
 		}
 		for i := 0; i < numChunks; i++ {
 			chunk, err := is.(*ProtocolDataInputStream).ReadBytes()
@@ -8091,7 +8049,7 @@ func (msg *GetLargeObjectResponseMessage) ReadPayload(is tgdb.TGInputStream) tgd
 				return err
 			}
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("GetLargeObjectResponseMessage:ReadPayload read chunk as '%+v'", chunk))
+				logger.Debug(fmt.Sprintf("GetLargeObjectResponseMessage:ReadPayload read chunk as '%+v'", chunk))
 			}
 			msg.boStream.Write(chunk)
 		}
@@ -8099,7 +8057,7 @@ func (msg *GetLargeObjectResponseMessage) ReadPayload(is tgdb.TGInputStream) tgd
 
 	msg.SetEntityId(entityId)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning GetLargeObjectResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning GetLargeObjectResponseMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -8144,7 +8102,6 @@ func (msg *GetLargeObjectResponseMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 const (
 	InvalidRequest = iota
@@ -8281,12 +8238,12 @@ func (msg *HandShakeRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tg
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *HandShakeRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering HandShakeRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering HandShakeRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside HandShakeRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside HandShakeRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -8295,7 +8252,7 @@ func (msg *HandShakeRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside HandShakeRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside HandShakeRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -8309,7 +8266,7 @@ func (msg *HandShakeRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning HandShakeRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning HandShakeRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -8413,9 +8370,9 @@ func (msg *HandShakeRequestMessage) String() string {
 	buffer.WriteString(fmt.Sprintf(", HandshakeType: %d", msg.handshakeType))
 	buffer.WriteString(fmt.Sprintf(", Version: %d", msg.version))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -8438,7 +8395,7 @@ func (msg *HandShakeRequestMessage) WriteHeader(os tgdb.TGOutputStream) tgdb.TGE
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *HandShakeRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering HandShakeRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering HandShakeRequestMessage:ReadPayload"))
 	}
 	//For Testing purpose only.
 	rType, err := is.(*ProtocolDataInputStream).ReadByte()
@@ -8447,7 +8404,7 @@ func (msg *HandShakeRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGEr
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside HandShakeRequestMessage:ReadPayload read rType as '%+v'", rType))
+		logger.Debug(fmt.Sprintf("Inside HandShakeRequestMessage:ReadPayload read rType as '%+v'", rType))
 	}
 
 	mode, err := is.(*ProtocolDataInputStream).ReadBoolean()
@@ -8456,7 +8413,7 @@ func (msg *HandShakeRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGEr
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside HandShakeRequestMessage:ReadPayload read mode as '%+v'", mode))
+		logger.Debug(fmt.Sprintf("Inside HandShakeRequestMessage:ReadPayload read mode as '%+v'", mode))
 	}
 
 	challenge, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -8465,14 +8422,14 @@ func (msg *HandShakeRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGEr
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside HandShakeRequestMessage:ReadPayload read challenge as '%+v'", challenge))
+		logger.Debug(fmt.Sprintf("Inside HandShakeRequestMessage:ReadPayload read challenge as '%+v'", challenge))
 	}
 
 	msg.SetRequestType(int(rType))
 	msg.SetSslMode(mode)
 	msg.SetChallenge(challenge)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning HandShakeRequestMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning HandShakeRequestMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -8481,7 +8438,7 @@ func (msg *HandShakeRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGEr
 func (msg *HandShakeRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering HandShakeRequestMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering HandShakeRequestMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 	os.(*ProtocolDataOutputStream).WriteByte(msg.GetRequestType())
 	os.(*ProtocolDataOutputStream).WriteBoolean(msg.GetSslMode())
@@ -8489,7 +8446,7 @@ func (msg *HandShakeRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TG
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning HandShakeRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning HandShakeRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -8527,8 +8484,6 @@ func (msg *HandShakeRequestMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 const (
 	ResponseInvalid = iota
@@ -8633,7 +8588,7 @@ func (msg *HandShakeResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:FromBytes read bufLen as '%d'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:FromBytes read bufLen as '%d'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -8641,7 +8596,7 @@ func (msg *HandShakeResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:FromBytes about to read Header data elements"))
+		logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:FromBytes about to read Header data elements"))
 	}
 	err = APMReadHeader(msg, is)
 	if err != nil {
@@ -8650,7 +8605,7 @@ func (msg *HandShakeResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:FromBytes about to read Payload data elements"))
+		logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:FromBytes about to read Payload data elements"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -8659,7 +8614,7 @@ func (msg *HandShakeResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning HandShakeResponseMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning HandShakeResponseMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -8667,12 +8622,12 @@ func (msg *HandShakeResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, t
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *HandShakeResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering HandShakeResponseMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering HandShakeResponseMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -8681,7 +8636,7 @@ func (msg *HandShakeResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside HandShakeResponseMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -8695,7 +8650,7 @@ func (msg *HandShakeResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning HandShakeResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning HandShakeResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -8797,9 +8752,9 @@ func (msg *HandShakeResponseMessage) String() string {
 	buffer.WriteString(fmt.Sprintf("Challenge: %d ", msg.challenge))
 	buffer.WriteString(fmt.Sprintf(", ResponseStatus: %d ", msg.responseStatus))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -8822,7 +8777,7 @@ func (msg *HandShakeResponseMessage) WriteHeader(os tgdb.TGOutputStream) tgdb.TG
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *HandShakeResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering HandShakeResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering HandShakeResponseMessage:ReadPayload"))
 	}
 	rStatus, err := is.(*ProtocolDataInputStream).ReadByte()
 	if err != nil {
@@ -8830,7 +8785,7 @@ func (msg *HandShakeResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:ReadPayload read rStatus as '%+v'", rStatus))
+		logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:ReadPayload read rStatus as '%+v'", rStatus))
 	}
 
 	challenge, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -8839,7 +8794,7 @@ func (msg *HandShakeResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:ReadPayload read challenge as '%+v'", challenge))
+		logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:ReadPayload read challenge as '%+v'", challenge))
 	}
 
 	if int(rStatus) == ResponseChallengeFailed {
@@ -8849,14 +8804,14 @@ func (msg *HandShakeResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:ReadPayload read rStatus as '%+v'", errMsgBytes))
+			logger.Debug(fmt.Sprintf("Inside HandShakeResponseMessage:ReadPayload read rStatus as '%+v'", errMsgBytes))
 		}
 		msg.SetErrorMessage(string(errMsgBytes))
 	}
 	msg.SetResponseStatus(int(rStatus))
 	msg.SetChallenge(challenge)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning HandShakeResponseMessage:ReadPayload"))
+		logger.Debug(fmt.Sprint("Returning HandShakeResponseMessage:ReadPayload"))
 	}
 	return nil
 }
@@ -8865,7 +8820,7 @@ func (msg *HandShakeResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGE
 func (msg *HandShakeResponseMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering HandShakeResponseMessage:WritePayload at output buffer position: '%d'", startPos))
+		logger.Debug(fmt.Sprintf("Entering HandShakeResponseMessage:WritePayload at output buffer position: '%d'", startPos))
 	}
 	//This is purely for testing. Client never writes out the response.
 	os.(*ProtocolDataOutputStream).WriteByte(msg.GetResponseStatus())
@@ -8873,7 +8828,7 @@ func (msg *HandShakeResponseMessage) WritePayload(os tgdb.TGOutputStream) tgdb.T
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning HandShakeResponseMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning HandShakeResponseMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -8913,8 +8868,6 @@ func (msg *HandShakeResponseMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type InvalidMessage struct {
 	*AbstractProtocolMessage
 }
@@ -8949,7 +8902,7 @@ func NewInvalidMessage(authToken, sessionId int64) *InvalidMessage {
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *InvalidMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering InvalidMessage:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering InvalidMessage:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning InvalidMessage:FromBytes w/ Error: Invalid Message Buffer"))
@@ -8991,7 +8944,7 @@ func (msg *InvalidMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGErro
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning InvalidMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning InvalidMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -8999,12 +8952,12 @@ func (msg *InvalidMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGErro
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *InvalidMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering InvalidMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering InvalidMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside InvalidMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside InvalidMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -9013,7 +8966,7 @@ func (msg *InvalidMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside InvalidMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside InvalidMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -9027,7 +8980,7 @@ func (msg *InvalidMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning InvalidMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning InvalidMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -9127,9 +9080,9 @@ func (msg *InvalidMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("InvalidMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -9194,8 +9147,6 @@ func (msg *InvalidMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type MetadataRequest struct {
 	*AbstractProtocolMessage
 }
@@ -9231,7 +9182,7 @@ func NewMetadataRequestMessage(authToken, sessionId int64) *MetadataRequest {
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *MetadataRequest) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering MetadataRequest:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering MetadataRequest:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning MetadataRequest:FromBytes w/ Error: Invalid Message Buffer"))
@@ -9247,7 +9198,7 @@ func (msg *MetadataRequest) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGErr
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside MetadataRequest:FromBytes read bufLen as '%+v'", bufLen))
+		logger.Debug(fmt.Sprintf("Inside MetadataRequest:FromBytes read bufLen as '%+v'", bufLen))
 	}
 	if bufLen != len(buffer) {
 		errMsg := fmt.Sprint("Buffer length mismatch")
@@ -9264,7 +9215,7 @@ func (msg *MetadataRequest) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGErr
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside MetadataRequest:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside MetadataRequest:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -9273,7 +9224,7 @@ func (msg *MetadataRequest) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGErr
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning MetadataRequest::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning MetadataRequest::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -9281,12 +9232,12 @@ func (msg *MetadataRequest) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGErr
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *MetadataRequest) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering MetadataRequest:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering MetadataRequest:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside MetadataRequest:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside MetadataRequest:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -9295,7 +9246,7 @@ func (msg *MetadataRequest) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside MetadataRequest:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside MetadataRequest:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -9309,7 +9260,7 @@ func (msg *MetadataRequest) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning MetadataRequest::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning MetadataRequest::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -9409,9 +9360,9 @@ func (msg *MetadataRequest) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("MetadataRequest:{")
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -9475,8 +9426,6 @@ func (msg *MetadataRequest) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type MetadataResponse struct {
 	*AbstractProtocolMessage
@@ -9567,7 +9516,7 @@ func (msg *MetadataResponse) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGEr
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside MetadataResponse:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside MetadataResponse:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -9576,7 +9525,7 @@ func (msg *MetadataResponse) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGEr
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning MetadataResponse::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning MetadataResponse::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -9584,12 +9533,12 @@ func (msg *MetadataResponse) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGEr
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *MetadataResponse) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering MetadataResponse:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering MetadataResponse:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside MetadataResponse:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside MetadataResponse:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -9598,7 +9547,7 @@ func (msg *MetadataResponse) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside MetadataResponse:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside MetadataResponse:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -9612,7 +9561,7 @@ func (msg *MetadataResponse) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning MetadataResponse::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning MetadataResponse::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -9727,9 +9676,9 @@ func (msg *MetadataResponse) String() string {
 	}
 	buffer.WriteString("}")
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -9752,7 +9701,7 @@ func (msg *MetadataResponse) WriteHeader(os tgdb.TGOutputStream) tgdb.TGError {
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering MetadataResponse:ReadPayload"))
+		logger.Debug(fmt.Sprint("Entering MetadataResponse:ReadPayload"))
 	}
 	avail, err := is.(*ProtocolDataInputStream).Available()
 	if err != nil {
@@ -9760,11 +9709,11 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read avail as '%+v'", avail))
+		logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read avail as '%+v'", avail))
 	}
 	if avail == 0 {
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Metadata response has no data"))
+			logger.Debug(fmt.Sprintf("Metadata response has no data"))
 		}
 		errMsg := fmt.Sprint("Metadata Response has no data")
 		return GetErrorByType(TGErrorIOException, INTERNAL_SERVER_ERROR, errMsg, "")
@@ -9776,7 +9725,7 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read count as '%+v'", count))
+		logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read count as '%+v'", count))
 	}
 	for {
 		if count <= 0 {
@@ -9789,7 +9738,7 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read SysType as '%+v'", sysType))
+			logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read SysType as '%+v'", sysType))
 		}
 
 		typeCount, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -9798,7 +9747,7 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read typeCount as '%+v'", typeCount))
+			logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read typeCount as '%+v'", typeCount))
 		}
 
 		if tgdb.TGSystemType(sysType) == tgdb.SystemTypeAttributeDescriptor {
@@ -9810,12 +9759,12 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 					return err
 				}
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read AttrDesc as '%+v'", attrDesc))
+					logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read AttrDesc as '%+v'", attrDesc))
 				}
 				msg.attrDescList = append(msg.attrDescList, attrDesc)
 			}
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read '%d' AttrDesc and assigned as '%+v'", typeCount, msg.attrDescList))
+				logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read '%d' AttrDesc and assigned as '%+v'", typeCount, msg.attrDescList))
 			}
 		} else if tgdb.TGSystemType(sysType) == tgdb.SystemTypeNode {
 			for i := 0; i < typeCount; i++ {
@@ -9830,12 +9779,12 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 					continue
 				}
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read nodeType as '%+v'", nodeType))
+					logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read nodeType as '%+v'", nodeType))
 				}
 				msg.nodeTypeList = append(msg.nodeTypeList, nodeType)
 			}
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read '%d' nodes and assigned as '%+v'", typeCount, msg.nodeTypeList))
+				logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read '%d' nodes and assigned as '%+v'", typeCount, msg.nodeTypeList))
 			}
 		} else if tgdb.TGSystemType(sysType) == tgdb.SystemTypeEdge {
 			for i := 0; i < typeCount; i++ {
@@ -9846,12 +9795,12 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 					return err
 				}
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read edgeType as '%+v'", edgeType))
+					logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read edgeType as '%+v'", edgeType))
 				}
 				msg.edgeTypeList = append(msg.edgeTypeList, edgeType)
 			}
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read '%d' edges and assigned as '%+v'", typeCount, msg.edgeTypeList))
+				logger.Debug(fmt.Sprintf("Inside MetadataResponse:ReadPayload read '%d' edges and assigned as '%+v'", typeCount, msg.edgeTypeList))
 			}
 		} else {
 			logger.Warning(fmt.Sprintf("WARNING: MetadataResponse:ReadPayload - Invalid metadata desc '%d' received", sysType))
@@ -9860,7 +9809,7 @@ func (msg *MetadataResponse) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
 		count -= typeCount
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning MetadataResponse:ReadPayload w/ MedataResponse as '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning MetadataResponse:ReadPayload w/ MedataResponse as '%+v'", msg))
 	}
 	return nil
 }
@@ -9906,8 +9855,6 @@ func (msg *MetadataResponse) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type PingMessage struct {
 	*AbstractProtocolMessage
 }
@@ -9942,7 +9889,7 @@ func NewPingMessage(authToken, sessionId int64) *PingMessage {
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *PingMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering PingMessage:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering PingMessage:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning PingMessage:FromBytes w/ Error: Invalid Message Buffer"))
@@ -9975,7 +9922,7 @@ func (msg *PingMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) 
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside PingMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside PingMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -9992,12 +9939,12 @@ func (msg *PingMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) 
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *PingMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering PingMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering PingMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside PingMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside PingMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -10006,7 +9953,7 @@ func (msg *PingMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside PingMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside PingMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -10020,7 +9967,7 @@ func (msg *PingMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning PingMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning PingMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -10120,9 +10067,9 @@ func (msg *PingMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("PingMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -10186,8 +10133,6 @@ func (msg *PingMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 /**
  * The Server describes the pdu header as below.
@@ -10587,7 +10532,6 @@ func WritePayload(verbId int, os tgdb.TGOutputStream) tgdb.TGError {
 	return msg.WritePayload(os)
 }
 
-
 type QueryRequestMessage struct {
 	*AbstractProtocolMessage
 	queryExpr       string
@@ -10813,7 +10757,7 @@ func (msg *QueryRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.T
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside QueryRequestMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside QueryRequestMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -10822,7 +10766,7 @@ func (msg *QueryRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.T
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning QueryRequestMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning QueryRequestMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -10830,12 +10774,12 @@ func (msg *QueryRequestMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.T
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *QueryRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering QueryRequestMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering QueryRequestMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside QueryRequestMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside QueryRequestMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -10844,7 +10788,7 @@ func (msg *QueryRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside QueryRequestMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside QueryRequestMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -10858,7 +10802,7 @@ func (msg *QueryRequestMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning QueryRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning QueryRequestMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -10972,7 +10916,7 @@ func (msg *QueryRequestMessage) String() string {
 	buffer.WriteString(fmt.Sprintf(", SortOrderDsc: %+v", msg.sortOrderDsc))
 	buffer.WriteString(fmt.Sprintf(", SortResultLimit: %d", msg.sortResultLimit))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
 	return msgStr
 }
@@ -11004,7 +10948,7 @@ func (msg *QueryRequestMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError 
 func (msg *QueryRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGError {
 	startPos := os.(*ProtocolDataOutputStream).GetPosition()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering QueryRequestMessage::WritePayload at output buffer position at: %d", startPos))
+		logger.Debug(fmt.Sprintf("Entering QueryRequestMessage::WritePayload at output buffer position at: %d", startPos))
 	}
 	os.(*ProtocolDataOutputStream).WriteInt(1) // datalength
 	os.(*ProtocolDataOutputStream).WriteInt(1) //checksum
@@ -11077,7 +11021,7 @@ func (msg *QueryRequestMessage) WritePayload(os tgdb.TGOutputStream) tgdb.TGErro
 	currPos := os.GetPosition()
 	length := currPos - startPos
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning QueryRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
+		logger.Debug(fmt.Sprintf("Returning QueryRequestMessage::WritePayload at output buffer position at: %d after writing %d payload bytes", currPos, length))
 	}
 	return nil
 }
@@ -11120,8 +11064,6 @@ func (msg *QueryRequestMessage) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type QueryResponseMessage struct {
 	*AbstractProtocolMessage
 	entityStream tgdb.TGInputStream
@@ -11130,7 +11072,7 @@ type QueryResponseMessage struct {
 	resultCount  int
 	result       int
 	queryHashId  int64
-	exception 	tgdb.TGError
+	exception    tgdb.TGError
 	//exception TGQueryException
 	resultTypeAnnot string
 }
@@ -11222,6 +11164,7 @@ func (msg *QueryResponseMessage) SetTotalCount(count int) {
 func (msg *QueryResponseMessage) SetResultTypeAnnot(anon string) {
 	msg.resultTypeAnnot = anon
 }
+
 /////////////////////////////////////////////////////////////////
 // Implement functions from Interface ==> TGMessage
 /////////////////////////////////////////////////////////////////
@@ -11229,7 +11172,7 @@ func (msg *QueryResponseMessage) SetResultTypeAnnot(anon string) {
 // FromBytes constructs a message object from the input buffer in the byte format
 func (msg *QueryResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering QueryResponseMessage:FromBytes"))
+		logger.Debug(fmt.Sprint("Entering QueryResponseMessage:FromBytes"))
 	}
 	if len(buffer) < 0 {
 		logger.Error(fmt.Sprint("ERROR: Returning QueryResponseMessage:FromBytes w/ Error: Invalid Message Buffer"))
@@ -11262,7 +11205,7 @@ func (msg *QueryResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside QueryResponseMessage:FromBytes - about to ReadPayload"))
+		logger.Debug(fmt.Sprint("Inside QueryResponseMessage:FromBytes - about to ReadPayload"))
 	}
 	err = msg.ReadPayload(is)
 	if err != nil {
@@ -11271,7 +11214,7 @@ func (msg *QueryResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning QueryResponseMessage::FromBytes resulted in '%+v'", msg))
+		logger.Debug(fmt.Sprintf("Returning QueryResponseMessage::FromBytes resulted in '%+v'", msg))
 	}
 	return msg, nil
 }
@@ -11279,12 +11222,12 @@ func (msg *QueryResponseMessage) FromBytes(buffer []byte) (tgdb.TGMessage, tgdb.
 // ToBytes converts a message object into byte format to be sent over the network to TGDB server
 func (msg *QueryResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering QueryResponseMessage:ToBytes"))
+		logger.Debug(fmt.Sprint("Entering QueryResponseMessage:ToBytes"))
 	}
 	os := DefaultProtocolDataOutputStream()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside QueryResponseMessage:ToBytes - about to APMWriteHeader"))
+		logger.Debug(fmt.Sprint("Inside QueryResponseMessage:ToBytes - about to APMWriteHeader"))
 	}
 	err := APMWriteHeader(msg, os)
 	if err != nil {
@@ -11293,7 +11236,7 @@ func (msg *QueryResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside QueryResponseMessage:ToBytes - about to WritePayload"))
+		logger.Debug(fmt.Sprint("Inside QueryResponseMessage:ToBytes - about to WritePayload"))
 	}
 	err = msg.WritePayload(os)
 	if err != nil {
@@ -11307,7 +11250,7 @@ func (msg *QueryResponseMessage) ToBytes() ([]byte, int, tgdb.TGError) {
 		return nil, -1, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning QueryResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning QueryResponseMessage::ToBytes results bytes-on-the-wire in '%+v'", os.GetBuffer()))
 	}
 	return os.GetBuffer(), os.GetLength(), nil
 }
@@ -11413,9 +11356,9 @@ func (msg *QueryResponseMessage) String() string {
 	buffer.WriteString(fmt.Sprintf(", QueryHashId: %d", msg.queryHashId))
 	//buffer.WriteString(fmt.Sprintf(", EntityStream: %+v", msg.entityStream))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -11435,8 +11378,8 @@ func (msg *QueryResponseMessage) WriteHeader(os tgdb.TGOutputStream) tgdb.TGErro
 	return APMWriteHeader(msg, os)
 }
 
-func (msg *QueryResponseMessage) processQueryStatus (is tgdb.TGInputStream, status int) (tgdb.TGError) {
-	if (status == 0) {
+func (msg *QueryResponseMessage) processQueryStatus(is tgdb.TGInputStream, status int) tgdb.TGError {
+	if status == 0 {
 		return nil
 	}
 
@@ -11455,9 +11398,8 @@ func fromStatus(status int) int {
 	if status > TGQueryInvalid && status < TGQueryErrorCodeEndMarker {
 		return status
 	}
-	return TGQueryInvalid;
+	return TGQueryInvalid
 }
-
 
 // ReadPayload reads the bytes from input stream and constructs message specific payload Attributes
 func (msg *QueryResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError {
@@ -11517,7 +11459,6 @@ func (msg *QueryResponseMessage) ReadPayload(is tgdb.TGInputStream) tgdb.TGError
 	if logger.IsDebug() {
 		logger.Debug(fmt.Sprintf("Inside QueryResponseMessage:ReadPayload read syntax as '%+v'", syntax))
 	}
-
 
 	//TODO: exception needs to be handled here
 	err = msg.processQueryStatus(is, result)
@@ -11613,8 +11554,6 @@ func (msg *QueryResponseMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type RollbackTransactionRequestMessage struct {
 	*AbstractProtocolMessage
@@ -11828,9 +11767,9 @@ func (msg *RollbackTransactionRequestMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("RollbackTransactionRequestMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -11894,7 +11833,6 @@ func (msg *RollbackTransactionRequestMessage) UnmarshalBinary(data []byte) error
 	}
 	return nil
 }
-
 
 type RollbackTransactionResponseMessage struct {
 	*AbstractProtocolMessage
@@ -12108,9 +12046,9 @@ func (msg *RollbackTransactionResponseMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("RollbackTransactionResponseMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -12174,8 +12112,6 @@ func (msg *RollbackTransactionResponseMessage) UnmarshalBinary(data []byte) erro
 	}
 	return nil
 }
-
-
 
 type SessionForcefullyTerminatedMessage struct {
 	*ExceptionMessage
@@ -12399,9 +12335,9 @@ func (msg *SessionForcefullyTerminatedMessage) String() string {
 	buffer.WriteString(fmt.Sprintf("ExceptionMsg: %s", msg.exceptionMsg))
 	buffer.WriteString(fmt.Sprintf(", ExceptionType: %d", msg.exceptionType))
 	buffer.WriteString(fmt.Sprintf(", BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -12489,7 +12425,6 @@ func (msg *SessionForcefullyTerminatedMessage) UnmarshalBinary(data []byte) erro
 	}
 	return nil
 }
-
 
 type TraverseRequestMessage struct {
 	*AbstractProtocolMessage
@@ -12703,9 +12638,9 @@ func (msg *TraverseRequestMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("TraverseRequestMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable
@@ -12769,8 +12704,6 @@ func (msg *TraverseRequestMessage) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
 
 type TraverseResponseMessage struct {
 	*AbstractProtocolMessage
@@ -12984,9 +12917,9 @@ func (msg *TraverseResponseMessage) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("TraverseResponseMessage:{")
 	buffer.WriteString(fmt.Sprintf("BufLength: %d", msg.BufLength))
-	strArray := []string{buffer.String(), msg.APMMessageToString()+"}"}
+	strArray := []string{buffer.String(), msg.APMMessageToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 // UpdateSequenceAndTimeStamp updates the SequenceAndTimeStamp, if message is mutable

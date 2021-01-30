@@ -27,14 +27,15 @@ import (
 	"encoding/binary"
 
 	//	"crypto/aes"
-//	"crypto/cipher"
+	//	"crypto/cipher"
 	"crypto/rand"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/gob"
 	"fmt"
-//	"golang.org/x/crypto/blowfish"
+
+	//	"golang.org/x/crypto/blowfish"
 	"io/ioutil"
 	"net"
 	"os"
@@ -44,8 +45,9 @@ import (
 	"sync"
 	"sync/atomic"
 	"syscall"
-	"tgdb"
 	"time"
+
+	"github.com/yxuco/tgdb"
 )
 
 // Default settings - A fallback option - to construct a valid connection URL to TGDB server
@@ -476,7 +478,6 @@ func (obj *LinkUrl) String() string {
 	return buffer.String()
 }
 
-
 // ======= Exception channel Type =======
 type ExceptionChannelType int
 
@@ -539,8 +540,8 @@ type AbstractChannel struct {
 	exceptionCond     *sync.Cond    // Condition for lock
 	sendLock          sync.Mutex    // reentrant-lock for synchronizing sending/receiving messages over the wire
 	tracer            tgdb.TGTracer // Used for tracing the information flow during the execution
-	user			string
-	pw				[]byte
+	user              string
+	pw                []byte
 }
 
 func DefaultAbstractChannel() *AbstractChannel {
@@ -621,10 +622,9 @@ func (obj *AbstractChannel) DoAuthenticate() tgdb.TGError {
 	return nil
 }
 
-func (obj *AbstractChannel) SetAuthToken (token int64) {
+func (obj *AbstractChannel) SetAuthToken(token int64) {
 	obj.authToken = token
 }
-
 
 func (obj *AbstractChannel) channelToString() string {
 	var buffer bytes.Buffer
@@ -791,7 +791,7 @@ func channelHandleException(obj tgdb.TGChannel, ex tgdb.TGError, bReconnect bool
 			obj.GetExceptionCondition().Broadcast()
 		}
 		obj.ExceptionUnlock()
-	} ()
+	}()
 
 	if ex.GetErrorType() != TGErrorIOException {
 		if logger.IsDebug() {
@@ -999,7 +999,7 @@ func channelRequestReply(obj tgdb.TGChannel, request tgdb.TGMessage) (tgdb.TGMes
 
 			//obj.ChannelUnlock()
 			return msg, nil
-		} ()
+		}()
 		if resp == nil && err == nil {
 			continue
 		} else if err != nil {
@@ -1087,7 +1087,7 @@ func channelSendMessage(obj tgdb.TGChannel, msg tgdb.TGMessage, resendFlag bool)
 				}
 			}
 			return false, nil
-		} ()
+		}()
 		if contFlag {
 			continue
 		} else {
@@ -1126,7 +1126,7 @@ func channelSendRequest(obj tgdb.TGChannel, msg tgdb.TGMessage, channelResponse 
 		if logger.IsDebug() {
 			logger.Debug(fmt.Sprintf("Inside AbstractChannel:channelSendRequest Infinite Loop"))
 		}
-		resp, err := func() (tgdb.TGMessage, tgdb.TGError)  {
+		resp, err := func() (tgdb.TGMessage, tgdb.TGError) {
 			obj.ChannelLock()
 			defer obj.ChannelUnlock()
 
@@ -1202,7 +1202,7 @@ func channelSendRequest(obj tgdb.TGChannel, msg tgdb.TGMessage, channelResponse 
 			}
 			//obj.ChannelUnlock()
 			return msgResponse, nil
-		} ()
+		}()
 		if resp == nil && err == nil {
 			continue
 		} else if err != nil {
@@ -1259,7 +1259,7 @@ func channelStop(obj tgdb.TGChannel, bForcefully bool) {
 		}
 		// Execute Derived channel's method - Ignore Error Handling
 		obj.ChannelUnlock()
-	} ()
+	}()
 
 	if !isChannelConnected(obj) {
 		logger.Warning(fmt.Sprint("WARNING: Returning AbstractChannel:channelStop as channel is already disconnected"))
@@ -1725,7 +1725,6 @@ func (obj *ChannelTracer) Trace(msg tgdb.TGMessage) {
 	//logger.Log(fmt.Sprintf("Returning ChannelTracer:Trace ..."))
 }
 
-
 type ChannelMessageTracer struct {
 	currentSuffix int
 	traceFile     *os.File
@@ -1933,7 +1932,6 @@ func (obj *ChannelMessageTracer) Stop() {
 	//logger.Log(fmt.Sprint("Returning ChannelMessageTracer:Stop ..."))
 }
 
-
 type BlockingChannelResponse struct {
 	status    tgdb.ChannelResponseStatus
 	requestId int64
@@ -2002,7 +2000,7 @@ func (obj *BlockingChannelResponse) Await(tester tgdb.StatusTester) {
 		}
 		// TODO: Remove this block once testing is over
 		count++
-		if (count%10000) == 0 {
+		if (count % 10000) == 0 {
 			if logger.IsDebug() {
 				logger.Debug(fmt.Sprintf("Inside BlockingChannelResponse:Await(%d) ... BlockingChannelResponse - %d", count, obj.status))
 			}
@@ -2112,7 +2110,6 @@ func (obj *BlockingChannelResponse) Test(status tgdb.ChannelResponseStatus) bool
 	}
 	return false
 }
-
 
 var gReaders int64
 
@@ -2313,11 +2310,10 @@ func (obj *ChannelReader) String() string {
 	return buffer.String()
 }
 
-
 type DataCryptoGrapher struct {
-	sessionId      int64
-	remoteCert     *x509.Certificate
-	pubKey         crypto.PublicKey
+	sessionId  int64
+	remoteCert *x509.Certificate
+	pubKey     crypto.PublicKey
 	//algoParameters *pkix.AlgorithmIdentifier
 }
 
@@ -2459,7 +2455,7 @@ func (obj *DataCryptoGrapher) Decrypt(is tgdb.TGInputStream) ([]byte, tgdb.TGErr
 	cnt := len / 8
 	rem := len % 8
 
-	for i:=0; i<int(cnt); i++ {
+	for i := 0; i < int(cnt); i++ {
 		val, err := is.(*ProtocolDataInputStream).ReadLong()
 		if err != nil {
 			logger.Error(fmt.Sprint("ERROR: Returning DataCryptoGrapher:Decrypt w/ Error in reading val from message buffer"))
@@ -2473,7 +2469,7 @@ func (obj *DataCryptoGrapher) Decrypt(is tgdb.TGInputStream) ([]byte, tgdb.TGErr
 		_ = out.WriteLongAsBytes(org)
 	}
 
-	for i:=0; i<int(rem); i++ {
+	for i := 0; i < int(rem); i++ {
 		val, err := is.(*ProtocolDataInputStream).ReadByte()
 		if err != nil {
 			logger.Error(fmt.Sprint("ERROR: Returning DataCryptoGrapher:Decrypt w/ Error in reading val from message buffer"))
@@ -2520,7 +2516,7 @@ func (obj *DataCryptoGrapher) Encrypt(rawBuf []byte) ([]byte, tgdb.TGError) {
 	ct := make([]byte, len(pt))
 	mode.CryptBlocks(ct, pt)
 	return ct
-	
+
 
 	block, err := blowfish.NewCipher(obj.remoteCert.RawSubjectPublicKeyInfo)
 	if err != nil {
@@ -2531,7 +2527,7 @@ func (obj *DataCryptoGrapher) Encrypt(rawBuf []byte) ([]byte, tgdb.TGError) {
 	mode := cipher.NewCBCEncrypter(block, iv)
 	mode.CryptBlocks(encryptedBuf[aes.BlockSize:], rawBuf)
 	fmt.Printf("%x\n", encryptedBuf)
-	
+
 	block := blowfish.NewCipher(obj.remoteCert.RawSubjectPublicKeyInfo)
 	encryptedBuf := make([]byte, aes.BlockSize+len(decBuffer))
 	iv := encryptedBuf[:aes.BlockSize]
@@ -2552,7 +2548,6 @@ func (obj *DataCryptoGrapher) Encrypt(rawBuf []byte) ([]byte, tgdb.TGError) {
 	//logger.Log(fmt.Sprintf("Returning DataCryptoGrapher:Decrypt() w/ encrypted buffer as '%+v'", encryptedBuf))
 	return nil, nil
 }
-
 
 const (
 	dataBufferSize = 32 * 1024 // 32 KB
@@ -2600,7 +2595,6 @@ func NewTCPChannel(linkUrl *LinkUrl, props *SortedProperties) *TCPChannel {
 // Private functions for TCPChannel
 /////////////////////////////////////////////////////////////////
 
-
 func (obj *TCPChannel) DoAuthenticateForRESTConsumer() tgdb.TGError {
 	if logger.IsDebug() {
 		logger.Debug(fmt.Sprintf("======> Entering TCPChannel:DoAuthenticateForRESTConsumer"))
@@ -2624,7 +2618,7 @@ func (obj *TCPChannel) DoAuthenticateForRESTConsumer() tgdb.TGError {
 		logger.Error(fmt.Sprintf("ERROR: Returning TCPChannel::DoAuthenticateForRESTConsumer channelSendRequest failed w/ '%+v'", err.Error()))
 		return err
 	}
-	if ! msgResponse.(*AuthenticateResponseMessage).IsSuccess() {
+	if !msgResponse.(*AuthenticateResponseMessage).IsSuccess() {
 		logger.Error(fmt.Sprintf("ERROR: Returning TCPChannel::DoAuthenticateForRESTConsumer msgResponse.(*AuthenticateResponseMessage).IsSuccess() failed"))
 		return NewTGBadAuthenticationWithRealm(INTERNAL_SERVER_ERROR, TGErrorBadAuthentication, "Bad username/password combination", "", "tgdb")
 	}
@@ -2643,7 +2637,6 @@ func (obj *TCPChannel) DoAuthenticateForRESTConsumer() tgdb.TGError {
 	}
 	return nil
 }
-
 
 func (obj *TCPChannel) DoAuthenticate() tgdb.TGError {
 	if logger.IsDebug() {
@@ -2669,7 +2662,7 @@ func (obj *TCPChannel) DoAuthenticate() tgdb.TGError {
 		return err
 	}
 	//logger.Debug(fmt.Sprintf("======> Inside TCPChannel:doAuthenticate received reply as '%+v'", msgResponse.String()))
-	if ! msgResponse.(*AuthenticateResponseMessage).IsSuccess() {
+	if !msgResponse.(*AuthenticateResponseMessage).IsSuccess() {
 		logger.Error(fmt.Sprintf("ERROR: Returning TCPChannel::doAuthenticate msgResponse.(*AuthenticateResponseMessage).IsSuccess() failed"))
 		return NewTGBadAuthenticationWithRealm(INTERNAL_SERVER_ERROR, TGErrorBadAuthentication, "Bad username/password combination", "", "tgdb")
 	}
@@ -2816,7 +2809,7 @@ func (obj *TCPChannel) setSocket(newSocket *net.TCPConn) tgdb.TGError {
 func (obj *TCPChannel) setBuffers(newSocket *net.TCPConn) tgdb.TGError {
 	sendSize := obj.channelProperties.GetPropertyAsInt(GetConfigFromKey(ChannelSendSize))
 	if sendSize > 0 {
-		err := newSocket.SetWriteBuffer(sendSize*1024)
+		err := newSocket.SetWriteBuffer(sendSize * 1024)
 		if err != nil {
 			logger.Error(fmt.Sprintf("ERROR: Returning TCPChannel::setBuffers newSocket.SetWriteBuffer failed w/ '%+v'", err.Error()))
 			errMsg := fmt.Sprintf("TCPChannel:setBuffers unable to set write buffer limit to '%d'", sendSize*1024)
@@ -2825,7 +2818,7 @@ func (obj *TCPChannel) setBuffers(newSocket *net.TCPConn) tgdb.TGError {
 	}
 	receiveSize := obj.channelProperties.GetPropertyAsInt(GetConfigFromKey(ChannelRecvSize))
 	if receiveSize > 0 {
-		err := newSocket.SetReadBuffer(receiveSize*1024)
+		err := newSocket.SetReadBuffer(receiveSize * 1024)
 		if err != nil {
 			logger.Error(fmt.Sprintf("ERROR: Returning TCPChannel::setBuffers SetReadBuffer failed w/ '%+v'", err.Error()))
 			errMsg := fmt.Sprintf("TCPChannel:setBuffers unable to set read buffer limit to '%d'", receiveSize*1024)
@@ -2859,7 +2852,7 @@ func (obj *TCPChannel) validateHandshakeResponseVersion(sVersion int64, cVersion
 
 	cStrVer := cVersion.GetVersionString()
 
-	if 	serverVersion.GetMajor() == cVersion.GetMajor() &&
+	if serverVersion.GetMajor() == cVersion.GetMajor() &&
 		serverVersion.GetMinor() == cVersion.GetMinor() &&
 		serverVersion.GetUpdate() == cVersion.GetUpdate() {
 		return nil
@@ -2907,7 +2900,7 @@ func (obj *TCPChannel) writeLoop(done chan bool) {
 		default:
 			// TODO: Revisit later - Do something
 		}
-	}	// End of Infinite Loop
+	} // End of Infinite Loop
 	// Send an acknowledgement of completion to the parent thread
 	done <- true
 	if logger.IsDebug() {
@@ -3226,7 +3219,7 @@ func (obj *TCPChannel) CloseSocket() tgdb.TGError {
 		obj.socket = nil
 		obj.input = nil
 		obj.output = nil
-	} ()
+	}()
 
 	if obj.socket != nil {
 		cErr := obj.socket.Close()
@@ -3311,7 +3304,7 @@ func (obj *TCPChannel) ReadWireMsg() (tgdb.TGMessage, tgdb.TGError) {
 	}
 	obj.lastActiveTime = time.Now()
 
-	totalBuffer := make ([]byte, 4)
+	totalBuffer := make([]byte, 4)
 	count, err11 := obj.socket.Read(totalBuffer)
 	var totalBytesOnSocket uint32
 	if err11 != nil || count <= 0 {
@@ -3324,8 +3317,8 @@ func (obj *TCPChannel) ReadWireMsg() (tgdb.TGMessage, tgdb.TGError) {
 	// Read the data on the socket
 	buff := make([]byte, totalBytesOnSocket-4)
 	nInterim := 0
-	for ;nInterim < int(totalBytesOnSocket-4); {
-		nCurrent, sErr := obj.socket.Read(buff[nInterim: totalBytesOnSocket-4])
+	for nInterim < int(totalBytesOnSocket-4) {
+		nCurrent, sErr := obj.socket.Read(buff[nInterim : totalBytesOnSocket-4])
 		if sErr != nil || nCurrent <= 0 {
 			errMsg := "TCPChannel::ReadWireMsg obj.socket.Read failed"
 			logger.Error(fmt.Sprintf("ERROR: Returning %s w/ '%+v'", errMsg, sErr.Error()))
@@ -3337,7 +3330,7 @@ func (obj *TCPChannel) ReadWireMsg() (tgdb.TGMessage, tgdb.TGError) {
 	slice := buff[0:nInterim]
 	totalBuffer = append(totalBuffer, slice...)
 
-	in.Buf = make ([]byte, totalBytesOnSocket)
+	in.Buf = make([]byte, totalBytesOnSocket)
 	copy(in.Buf, totalBuffer[:totalBytesOnSocket])
 	in.BufLen = int(totalBytesOnSocket)
 
@@ -3414,11 +3407,10 @@ func (obj *TCPChannel) String() string {
 	buffer.WriteString(fmt.Sprintf(", Socket: %+v", obj.socket))
 	//buffer.WriteString(fmt.Sprintf(", Input: %+v", obj.input.String()))
 	//buffer.WriteString(fmt.Sprintf(", Output: %+v", obj.output.String()))
-	strArray := []string{buffer.String(), obj.channelToString()+"}"}
+	strArray := []string{buffer.String(), obj.channelToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
 	return msgStr
 }
-
 
 type SSLChannel struct {
 	*AbstractChannel
@@ -3804,7 +3796,7 @@ func (obj *SSLChannel) validateHandshakeResponseVersion(sVersion int64, cVersion
 
 	cStrVer := cVersion.GetVersionString()
 
-	if 	serverVersion.GetMajor() == cVersion.GetMajor() &&
+	if serverVersion.GetMajor() == cVersion.GetMajor() &&
 		serverVersion.GetMinor() == cVersion.GetMinor() &&
 		serverVersion.GetUpdate() == cVersion.GetUpdate() {
 		return nil
@@ -4177,7 +4169,7 @@ func (obj *SSLChannel) CloseSocket() tgdb.TGError {
 		obj.socket = nil
 		obj.input = nil
 		obj.output = nil
-	} ()
+	}()
 
 	if obj.socket != nil {
 		cErr := obj.socket.Close()
@@ -4357,7 +4349,6 @@ func (obj *SSLChannel) String() string {
 	return msgStr
 }
 
-
 //var logger = logging.DefaultTGLogManager().GetLogger()
 
 type TGChannelFactory struct {
@@ -4489,8 +4480,6 @@ func (obj *TGChannelFactory) CreateChannelWithProperties(urlPath, userName, pass
 	return obj.createChannelWithProperties(urlPath, userName, password, props)
 }
 
-
-
 type TGCipherSuite struct {
 	suiteId     uint16
 	opensslName string
@@ -4530,7 +4519,7 @@ func NewCipherSuite(id uint16, name, key, encr, bitSize string) *TGCipherSuite {
 // GetCipherSuite returns the TGCipherSuite given its full qualified string form or its alias Name.
 func GetCipherSuite(nameOrAlias string) *TGCipherSuite {
 	for name, suite := range PreDefinedCipherSuites {
-		if 	strings.ToLower(name) == strings.ToLower(nameOrAlias) ||
+		if strings.ToLower(name) == strings.ToLower(nameOrAlias) ||
 			strings.ToLower(suite.opensslName) == strings.ToLower(nameOrAlias) {
 			return &suite
 		}
@@ -4542,7 +4531,7 @@ func GetCipherSuite(nameOrAlias string) *TGCipherSuite {
 // GetCipherSuiteById returns the TGCipherSuite given its ID.
 func GetCipherSuiteById(id uint16) *TGCipherSuite {
 	for _, suite := range PreDefinedCipherSuites {
-		if 	suite.suiteId == id {
+		if suite.suiteId == id {
 			return &suite
 		}
 	}
@@ -4575,5 +4564,3 @@ func FilterSuitesById(suites []uint16) []uint16 {
 	}
 	return supportedSuites
 }
-
-

@@ -28,7 +28,8 @@ import (
 	"reflect"
 	"strings"
 	"sync/atomic"
-	"tgdb"
+
+	"github.com/yxuco/tgdb"
 )
 
 type AbstractEntity struct {
@@ -46,8 +47,6 @@ type AbstractEntity struct {
 }
 
 var EntitySequencer int64
-
-
 
 func DefaultAbstractEntity() *AbstractEntity {
 	// We must register the concrete type for the encoder and decoder (which would
@@ -106,7 +105,7 @@ func (obj *AbstractEntity) getAttribute(name string) tgdb.TGAttribute {
 func (obj *AbstractEntity) getAttributes() ([]tgdb.TGAttribute, tgdb.TGError) {
 	if obj.Attributes == nil {
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:getAttributes as there are NO Attributes associated"))
+			logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:getAttributes as there are NO Attributes associated"))
 		}
 		errMsg := "This entity does not have any Attributes associated"
 		return nil, GetErrorByType(TGErrorIOException, INTERNAL_SERVER_ERROR, errMsg, "")
@@ -228,7 +227,7 @@ func (obj *AbstractEntity) setAttribute(attr tgdb.TGAttribute) tgdb.TGError {
 	attrDesc := attr.GetAttributeDescriptor()
 	if attrDesc == nil {
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:setAttribute as AttrDesc is EMPTY"))
+			logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:setAttribute as AttrDesc is EMPTY"))
 		}
 		errMsg := fmt.Sprintf("Attribute Descriptor cannot be null")
 		return GetErrorByType(TGErrorGeneralException, INTERNAL_SERVER_ERROR, errMsg, "")
@@ -236,7 +235,7 @@ func (obj *AbstractEntity) setAttribute(attr tgdb.TGAttribute) tgdb.TGError {
 	attrDescName := attrDesc.GetName()
 	if attrDescName == "" {
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:setAttribute as attrDescName is EMPTY"))
+			logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:setAttribute as attrDescName is EMPTY"))
 		}
 		errMsg := fmt.Sprintf("Name of the attribute cannot be null")
 		return GetErrorByType(TGErrorGeneralException, INTERNAL_SERVER_ERROR, errMsg, "")
@@ -250,14 +249,13 @@ func (obj *AbstractEntity) setAttribute(attr tgdb.TGAttribute) tgdb.TGError {
 	return nil
 }
 
-
 func (obj *AbstractEntity) setOrCreateAttribute(name string, value interface{}) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AbstractEntity:SetOrCreateAttribute received N-V Pair as '%+v'='%+v'", name, value))
+		logger.Debug(fmt.Sprintf("Entering AbstractEntity:SetOrCreateAttribute received N-V Pair as '%+v'='%+v'", name, value))
 	}
 	if name == "" || value == nil {
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:SetOrCreateAttribute as either Name or value is EMPTY"))
+			logger.Debug(fmt.Sprint("ERROR: Returning AbstractEntity:SetOrCreateAttribute as either Name or value is EMPTY"))
 		}
 		errMsg := fmt.Sprintf("Name of the attribute cannot be null")
 		return GetErrorByType(TGErrorGeneralException, INTERNAL_SERVER_ERROR, errMsg, "")
@@ -279,7 +277,7 @@ func (obj *AbstractEntity) setOrCreateAttribute(name string, value interface{}) 
 			}
 			aType := reflect.TypeOf(value).String()
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside AbstractEntity:SetOrCreateAttribute Abstract Entity creating new attribute '%+v':'%+v'(%+v) <=======", name, value, aType))
+				logger.Debug(fmt.Sprintf("Inside AbstractEntity:SetOrCreateAttribute Abstract Entity creating new attribute '%+v':'%+v'(%+v) <=======", name, value, aType))
 			}
 			// TODO: Do we need to validate if this descriptor exists as part of Graph Meta Data???
 			attrDesc = gmd.CreateAttributeDescriptorForDataType(name, aType)
@@ -307,7 +305,7 @@ func (obj *AbstractEntity) setOrCreateAttribute(name string, value interface{}) 
 	// Add it to the set
 	obj.Attributes[name] = attr
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AbstractEntity:SetOrCreateAttribute created/set attribute for '%+v'='%+v'", name, value))
+		logger.Debug(fmt.Sprintf("Returning AbstractEntity:SetOrCreateAttribute created/set attribute for '%+v'='%+v'", name, value))
 	}
 	return nil
 }
@@ -356,7 +354,7 @@ func (obj *AbstractEntity) SetModifiedAttributes(modAttrs []tgdb.TGAttribute) {
 
 func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AbstractEntity:AbstractEntityReadExternal"))
+		logger.Debug(fmt.Sprint("Entering AbstractEntity:AbstractEntityReadExternal"))
 	}
 	newEntityFlag, err := is.(*ProtocolDataInputStream).ReadBoolean() // Should always be False.
 	if err != nil {
@@ -364,7 +362,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read newEntityFlag as '%+v'", newEntityFlag))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read newEntityFlag as '%+v'", newEntityFlag))
 	}
 	if newEntityFlag {
 		//TGDB-504
@@ -378,10 +376,10 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read eKind as '%+v'", eKind))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read eKind as '%+v'", eKind))
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal - Object Kind is '%+v'", obj.EntityKind))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal - Object Kind is '%+v'", obj.EntityKind))
 	}
 	if obj.GetEntityKind() != tgdb.TGEntityKind(eKind) {
 		logger.Error(fmt.Sprint("ERROR: Returning AbstractEntity:AbstractEntityReadExternal as obj.GetEntityKind() != types.TGEntityKind(eKind)"))
@@ -396,7 +394,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read entityId as '%d'", entityId))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read entityId as '%d'", entityId))
 	}
 
 	version, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -405,7 +403,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read version as '%d'", version))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read version as '%d'", version))
 	}
 
 	var eType tgdb.TGEntityType
@@ -415,7 +413,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read entityTypeId as '%d'", entityTypeId))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read entityTypeId as '%d'", entityTypeId))
 	}
 	if entityTypeId != 0 {
 		eType1, err := obj.graphMetadata.GetNodeTypeById(entityTypeId)
@@ -424,7 +422,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal verified eType1 (nodeTypeById) as '%+v'", eType1))
+			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal verified eType1 (nodeTypeById) as '%+v'", eType1))
 		}
 		if eType1 == nil {
 			eType, err = obj.graphMetadata.GetEdgeTypeById(entityTypeId)
@@ -433,7 +431,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 				return err
 			}
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal verified eType (edgeTypeById) as '%+v'", eType))
+				logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal verified eType (edgeTypeById) as '%+v'", eType))
 			}
 			if eType == nil {
 				// TODO: Revisit later - Should we retrieve entity desc together with the entity?
@@ -444,7 +442,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal inferred from metadata, eType as '%+v'", eType))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal inferred from metadata, eType as '%+v'", eType))
 	}
 
 	count, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -453,7 +451,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read attribute count as '%d'", count))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read attribute count as '%d'", count))
 	}
 	for i := 0; i < count; i++ {
 		attr, err := ReadExternalForEntity(obj, is)
@@ -462,7 +460,7 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read attr as '%+v'", attr))
+			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityReadExternal read attr as '%+v'", attr))
 		}
 		err = obj.SetAttribute(attr)
 		if err != nil {
@@ -475,14 +473,14 @@ func (obj *AbstractEntity) AbstractEntityReadExternal(is tgdb.TGInputStream) tgd
 	obj.SetIsNew(newEntityFlag)
 	obj.SetVersion(version)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AbstractEntity:AbstractEntityReadExternal w/ NO error, for entity: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning AbstractEntity:AbstractEntityReadExternal w/ NO error, for entity: '%+v'", obj))
 	}
 	return nil
 }
 
 func (obj *AbstractEntity) AbstractEntityWriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AbstractEntity:AbstractEntityWriteExternal"))
+		logger.Debug(fmt.Sprint("Entering AbstractEntity:AbstractEntityWriteExternal"))
 	}
 	os.(*ProtocolDataOutputStream).WriteBoolean(obj.GetIsNew())
 	os.(*ProtocolDataOutputStream).WriteByte(int(obj.GetEntityKind())) //Write the EntityKind
@@ -490,7 +488,7 @@ func (obj *AbstractEntity) AbstractEntityWriteExternal(os tgdb.TGOutputStream) t
 	os.(*ProtocolDataOutputStream).WriteLong(obj.GetVirtualId())
 	os.(*ProtocolDataOutputStream).WriteInt(obj.GetVersion())
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityWriteExternal - obj.EntityType is '%+v'", obj.GetEntityType()))
+		logger.Debug(fmt.Sprintf("Inside AbstractEntity:AbstractEntityWriteExternal - obj.EntityType is '%+v'", obj.GetEntityType()))
 	}
 	if obj.GetEntityType() == nil {
 		os.(*ProtocolDataOutputStream).WriteInt(0)
@@ -520,7 +518,7 @@ func (obj *AbstractEntity) AbstractEntityWriteExternal(os tgdb.TGOutputStream) t
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AbstractEntity:AbstractEntityWriteExternal w/ NO error, for entity: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning AbstractEntity:AbstractEntityWriteExternal w/ NO error, for entity: '%+v'", obj))
 	}
 	return nil
 }
@@ -718,7 +716,7 @@ func (obj *EntityType) SetParent(parentEntity tgdb.TGEntityType) {
 
 func EntityTypeReadExternal(obj tgdb.TGEntityType, is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering EntityType:EntityTypeReadExternal"))
+		logger.Debug(fmt.Sprint("Entering EntityType:EntityTypeReadExternal"))
 	}
 	// TODO: Revisit later - Do we save the desc value?
 	sType, err := is.(*ProtocolDataInputStream).ReadByte()
@@ -739,7 +737,7 @@ func EntityTypeReadExternal(obj tgdb.TGEntityType, is tgdb.TGInputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read eId as '%d'", eId))
+		logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read eId as '%d'", eId))
 	}
 
 	eName, err := is.(*ProtocolDataInputStream).ReadUTF()
@@ -748,7 +746,7 @@ func EntityTypeReadExternal(obj tgdb.TGEntityType, is tgdb.TGInputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read eName as '%s'", eName))
+		logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read eName as '%s'", eName))
 	}
 
 	_, err = is.(*ProtocolDataInputStream).ReadInt() // pagesize
@@ -765,7 +763,7 @@ func EntityTypeReadExternal(obj tgdb.TGEntityType, is tgdb.TGInputStream) tgdb.T
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read attrCount as '%d'", attrCount))
+		logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read attrCount as '%d'", attrCount))
 	}
 
 	for i := 0; i < int(attrCount); i++ {
@@ -775,7 +773,7 @@ func EntityTypeReadExternal(obj tgdb.TGEntityType, is tgdb.TGInputStream) tgdb.T
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read attrName as '%s'", attrName))
+			logger.Debug(fmt.Sprintf("Inside EntityType:EntityTypeReadExternal read attrName as '%s'", attrName))
 		}
 		// TODO: The stream only contains Name of the descriptor. Do we need to lookup the descriptor from GraphMetaData?
 		attrDesc := NewAttributeDescriptorWithType(attrName, AttributeTypeString)
@@ -785,14 +783,14 @@ func EntityTypeReadExternal(obj tgdb.TGEntityType, is tgdb.TGInputStream) tgdb.T
 	obj.SetName(eName)
 	obj.SetSystemType(tgdb.TGSystemType(sType))
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning EntityType:EntityTypeReadExternal w/ NO error, for entityType: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning EntityType:EntityTypeReadExternal w/ NO error, for entityType: '%+v'", obj))
 	}
 	return nil
 }
 
 func EntityTypeUpdateMetadata(obj tgdb.TGEntityType, gmd *GraphMetadata) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering EntityType:EntityTypeUpdateMetadata"))
+		logger.Debug(fmt.Sprint("Entering EntityType:EntityTypeUpdateMetadata"))
 	}
 	for attrName, _ := range obj.(*EntityType).Attributes {
 		attrDesc, err := gmd.GetAttributeDescriptor(attrName)
@@ -812,7 +810,7 @@ func EntityTypeUpdateMetadata(obj tgdb.TGEntityType, gmd *GraphMetadata) tgdb.TG
 		obj.AddAttributeDescriptor(attrName, attrDesc)
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning EntityType:EntityTypeUpdateMetadata w/ NO error, for entityType: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning EntityType:EntityTypeUpdateMetadata w/ NO error, for entityType: '%+v'", obj))
 	}
 	return nil
 }
@@ -1004,7 +1002,7 @@ func (obj *NodeType) SetNumEntries(num int64) {
 
 func (obj *NodeType) UpdateMetadata(gmd *GraphMetadata) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering NodeType:UpdateMetadata"))
+		logger.Debug(fmt.Sprint("Entering NodeType:UpdateMetadata"))
 	}
 	// Base Class EntityType::UpdateMetadata()
 
@@ -1014,7 +1012,7 @@ func (obj *NodeType) UpdateMetadata(gmd *GraphMetadata) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside NodeType:UpdateMetadata, updated base entity type's Attributes"))
+		logger.Debug(fmt.Sprint("Inside NodeType:UpdateMetadata, updated base entity type's Attributes"))
 	}
 	for id, key := range obj.pKeys {
 		attrDesc, err := gmd.GetAttributeDescriptor(key.GetName())
@@ -1029,7 +1027,7 @@ func (obj *NodeType) UpdateMetadata(gmd *GraphMetadata) tgdb.TGError {
 		obj.pKeys[id] = attrDesc.(*AttributeDescriptor)
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning NodeType:UpdateMetadata w/ NO error, for entityType: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning NodeType:UpdateMetadata w/ NO error, for entityType: '%+v'", obj))
 	}
 	return nil
 }
@@ -1109,9 +1107,9 @@ func (obj *NodeType) String() string {
 	//buffer.WriteString(fmt.Sprintf("PKeys: %+v", obj.PKeys))
 	buffer.WriteString(fmt.Sprintf(", IdxIds: %+v", obj.idxIds))
 	buffer.WriteString(fmt.Sprintf(", NumEntries: %+v", obj.numEntries))
-	strArray := []string{buffer.String(), obj.entityTypeToString()+"}"}
+	strArray := []string{buffer.String(), obj.entityTypeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -1135,7 +1133,7 @@ func (obj *NodeType) GetSystemType() tgdb.TGSystemType {
 // ReadExternal reads the byte format from an external input stream and constructs a system object
 func (obj *NodeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering NodeType:ReadExternal"))
+		logger.Debug(fmt.Sprint("Entering NodeType:ReadExternal"))
 	}
 	// Base Class EntityType's ReadExternal()
 	err := EntityTypeReadExternal(obj, is)
@@ -1143,7 +1141,7 @@ func (obj *NodeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside NodeType:ReadExternal, read base entity type's Attributes"))
+		logger.Debug(fmt.Sprint("Inside NodeType:ReadExternal, read base entity type's Attributes"))
 	}
 
 	attrCount, err := is.(*ProtocolDataInputStream).ReadShort()
@@ -1152,7 +1150,7 @@ func (obj *NodeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read attrCount as '%d'", attrCount))
+		logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read attrCount as '%d'", attrCount))
 	}
 	for i := 0; i < int(attrCount); i++ {
 		attrName, err := is.(*ProtocolDataInputStream).ReadUTF()
@@ -1161,7 +1159,7 @@ func (obj *NodeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read attrName as '%s'", attrName))
+			logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read attrName as '%s'", attrName))
 		}
 		attrDesc := NewAttributeDescriptorWithType(attrName, AttributeTypeString)
 		obj.pKeys = append(obj.pKeys, attrDesc)
@@ -1173,7 +1171,7 @@ func (obj *NodeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read idxCount as '%d'", idxCount))
+		logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read idxCount as '%d'", idxCount))
 	}
 	for i := 0; i < int(idxCount); i++ {
 		// TODO: Revisit later to get meta data needs to return index definitions
@@ -1183,7 +1181,7 @@ func (obj *NodeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read indexId as '%d'", indexId))
+			logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read indexId as '%d'", indexId))
 		}
 		obj.idxIds = append(obj.idxIds, indexId)
 	}
@@ -1194,12 +1192,12 @@ func (obj *NodeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read numEntries as '%d'", numEntries))
+		logger.Debug(fmt.Sprintf("Inside NodeType:ReadExternal read numEntries as '%d'", numEntries))
 	}
 
 	obj.SetNumEntries(numEntries)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning NodeType:ReadExternal w/ NO error, for NodeType: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning NodeType:ReadExternal w/ NO error, for NodeType: '%+v'", obj))
 	}
 	return nil
 }
@@ -1240,7 +1238,6 @@ func (obj *NodeType) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 type Node struct {
 	*AbstractEntity
@@ -1463,7 +1460,7 @@ func (obj *Node) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("Node:{")
 	buffer.WriteString(fmt.Sprintf("Edges: %+v", obj.Edges))
-	strArray := []string{buffer.String(), obj.entityToString()+"}"}
+	strArray := []string{buffer.String(), obj.entityToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
 	return msgStr
 }
@@ -1475,7 +1472,7 @@ func (obj *Node) String() string {
 // ReadExternal reads the byte format from an external input stream and constructs a system object
 func (obj *Node) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering Node:ReadExternal"))
+		logger.Debug(fmt.Sprint("Entering Node:ReadExternal"))
 	}
 	// TODO: Revisit later - Do we need to validate length?
 	nodeBufLen, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -1484,7 +1481,7 @@ func (obj *Node) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Node:ReadExternal read nodeBufLen as '%+v'", nodeBufLen))
+		logger.Debug(fmt.Sprintf("Inside Node:ReadExternal read nodeBufLen as '%+v'", nodeBufLen))
 	}
 
 	err = obj.AbstractEntityReadExternal(is)
@@ -1493,7 +1490,7 @@ func (obj *Node) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside Node:ReadExternal read abstractEntity"))
+		logger.Debug(fmt.Sprint("Inside Node:ReadExternal read abstractEntity"))
 	}
 
 	edgeCount, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -1502,7 +1499,7 @@ func (obj *Node) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Node:ReadExternal read edgeCount as '%d'", edgeCount))
+		logger.Debug(fmt.Sprintf("Inside Node:ReadExternal read edgeCount as '%d'", edgeCount))
 	}
 	for i := 0; i < edgeCount; i++ {
 		edgeId, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -1511,7 +1508,7 @@ func (obj *Node) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside Node:ReadExternal read edgeId as '%d'", edgeId))
+			logger.Debug(fmt.Sprintf("Inside Node:ReadExternal read edgeId as '%d'", edgeId))
 		}
 		var edge *Edge
 		var entity tgdb.TGEntity
@@ -1528,20 +1525,20 @@ func (obj *Node) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 			}
 			edge = edge1
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside Node:ReadExternal created new edge: '%+v'", edge))
+				logger.Debug(fmt.Sprintf("Inside Node:ReadExternal created new edge: '%+v'", edge))
 			}
 		} else {
 			edge = entity.(*Edge)
 		}
 		obj.Edges = append(obj.Edges, edge)
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside Node:ReadExternal Node has '%d' edges & StreamEntityCount is '%d'", len(obj.Edges), len(is.(*ProtocolDataInputStream).GetReferenceMap())))
+			logger.Debug(fmt.Sprintf("Inside Node:ReadExternal Node has '%d' edges & StreamEntityCount is '%d'", len(obj.Edges), len(is.(*ProtocolDataInputStream).GetReferenceMap())))
 		}
 	}
 
 	obj.SetIsInitialized(true)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning Node:ReadExternal w/ NO error, for node: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning Node:ReadExternal w/ NO error, for node: '%+v'", obj))
 	}
 	return nil
 }
@@ -1549,7 +1546,7 @@ func (obj *Node) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 // WriteExternal writes a system object into an appropriate byte format onto an external output stream
 func (obj *Node) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering Node:WriteExternal"))
+		logger.Debug(fmt.Sprint("Entering Node:WriteExternal"))
 	}
 	startPos := os.(*ProtocolDataOutputStream).GetPosition()
 	os.(*ProtocolDataOutputStream).WriteInt(0)
@@ -1559,7 +1556,7 @@ func (obj *Node) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside Node:WriteExternal - exported base entity Attributes"))
+		logger.Debug(fmt.Sprint("Inside Node:WriteExternal - exported base entity Attributes"))
 	}
 	newCount := 0
 	for _, edge := range obj.Edges {
@@ -1569,16 +1566,16 @@ func (obj *Node) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 	}
 	os.(*ProtocolDataOutputStream).WriteInt(newCount)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Node:WriteExternal - exported new edge count '%d'", newCount))
+		logger.Debug(fmt.Sprintf("Inside Node:WriteExternal - exported new edge count '%d'", newCount))
 	}
 	// Write the edges ids - ONLY include new edges
 	for _, edge := range obj.Edges {
-		if ! edge.GetIsNew() {
+		if !edge.GetIsNew() {
 			continue
 		}
 		os.(*ProtocolDataOutputStream).WriteLong(obj.GetVirtualId())
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside Node:WriteExternal - exported a new edge: '%+v'", edge))
+			logger.Debug(fmt.Sprintf("Inside Node:WriteExternal - exported a new edge: '%+v'", edge))
 		}
 	}
 	currPos := os.(*ProtocolDataOutputStream).GetPosition()
@@ -1589,7 +1586,7 @@ func (obj *Node) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning Node:WriteExternal w/ NO error, for node: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning Node:WriteExternal w/ NO error, for node: '%+v'", obj))
 	}
 	return nil
 }
@@ -1827,7 +1824,7 @@ func (obj *Edge) String() string {
 	if obj.ToNode != nil {
 		buffer.WriteString(fmt.Sprintf(", ToNode: %+v", obj.ToNode.GetVirtualId()))
 	}
-	strArray := []string{buffer.String(), obj.entityToString()+"}"}
+	strArray := []string{buffer.String(), obj.entityToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
 	return msgStr
 }
@@ -1839,7 +1836,7 @@ func (obj *Edge) String() string {
 // ReadExternal reads the byte format from an external input stream and constructs a system object
 func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering Edge:ReadExternal"))
+		logger.Debug(fmt.Sprint("Entering Edge:ReadExternal"))
 	}
 	// TODO: Revisit later - Do we need to validate length?
 	edgeBufLen, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -1847,7 +1844,7 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read edgeBufLen as '%+v'", edgeBufLen))
+		logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read edgeBufLen as '%+v'", edgeBufLen))
 	}
 
 	err = obj.AbstractEntityReadExternal(is)
@@ -1855,7 +1852,7 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside Edge:ReadExternal read abstractEntity"))
+		logger.Debug(fmt.Sprint("Inside Edge:ReadExternal read abstractEntity"))
 	}
 
 	direction, err := is.(*ProtocolDataInputStream).ReadByte()
@@ -1864,7 +1861,7 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read direction as '%+v'", direction))
+		logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read direction as '%+v'", direction))
 	}
 	if direction == 0 {
 		obj.SetDirectionType(tgdb.DirectionTypeUnDirected)
@@ -1883,7 +1880,7 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read fromNodeId as '%d'", fromNodeId))
+		logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read fromNodeId as '%d'", fromNodeId))
 	}
 	refMap := is.(*ProtocolDataInputStream).GetReferenceMap()
 	if refMap != nil {
@@ -1898,14 +1895,14 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		}
 		fromNode = fNode
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal created new fromNode: '%+v'", fromNode))
+			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal created new fromNode: '%+v'", fromNode))
 		}
 	} else {
 		fromNode = fromEntity.(*Node)
 	}
 	obj.SetFromNode(fromNode)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal Edge has fromNode & StreamEntityCount is '%d'", len(is.(*ProtocolDataInputStream).GetReferenceMap())))
+		logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal Edge has fromNode & StreamEntityCount is '%d'", len(is.(*ProtocolDataInputStream).GetReferenceMap())))
 	}
 
 	toNodeId, err := is.(*ProtocolDataInputStream).ReadLong()
@@ -1914,7 +1911,7 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read toNodeId as '%d'", toNodeId))
+		logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal read toNodeId as '%d'", toNodeId))
 	}
 	if refMap != nil {
 		toEntity = refMap[toNodeId]
@@ -1928,19 +1925,19 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		}
 		toNode = tNode
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal created new toNode: '%+v'", toNode))
+			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal created new toNode: '%+v'", toNode))
 		}
 	} else {
 		toNode = toEntity.(*Node)
 	}
 	obj.SetToNode(toNode)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal Edge has toNode & StreamEntityCount is '%d'", len(is.(*ProtocolDataInputStream).GetReferenceMap())))
+		logger.Debug(fmt.Sprintf("Inside Edge:ReadExternal Edge has toNode & StreamEntityCount is '%d'", len(is.(*ProtocolDataInputStream).GetReferenceMap())))
 	}
 
 	obj.SetIsInitialized(true)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning Edge:ReadExternal w/ NO error, for edge: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning Edge:ReadExternal w/ NO error, for edge: '%+v'", obj))
 	}
 	return nil
 }
@@ -1948,7 +1945,7 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 // WriteExternal writes a system object into an appropriate byte format onto an external output stream
 func (obj *Edge) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering Edge:WriteExternal"))
+		logger.Debug(fmt.Sprint("Entering Edge:WriteExternal"))
 	}
 	startPos := os.(*ProtocolDataOutputStream).GetPosition()
 	os.(*ProtocolDataOutputStream).WriteInt(0)
@@ -1958,7 +1955,7 @@ func (obj *Edge) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside Edge:WriteExternal - exported base entity Attributes"))
+		logger.Debug(fmt.Sprint("Inside Edge:WriteExternal - exported base entity Attributes"))
 	}
 	// TODO: Revisit later - Check w/ TGDB Engineering team as what the difference should be for if-n-else conditions
 	// Write the edges ids
@@ -1979,7 +1976,7 @@ func (obj *Edge) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning Edge:WriteExternal w/ NO error, for edge: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning Edge:WriteExternal w/ NO error, for edge: '%+v'", obj))
 	}
 	return nil
 }
@@ -2017,7 +2014,6 @@ func (obj *Edge) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
 
 type EdgeType struct {
 	*EntityType
@@ -2081,7 +2077,7 @@ func (obj *EdgeType) GetNumEntries() int64 {
 
 func (obj *EdgeType) UpdateMetadata(gmd *GraphMetadata) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering EdgeType:UpdateMetadata"))
+		logger.Debug(fmt.Sprint("Entering EdgeType:UpdateMetadata"))
 	}
 	// Base Class EntityType::UpdateMetadata()
 	//err := EntityTypeUpdateMetadata(obj, gmd)
@@ -2090,7 +2086,7 @@ func (obj *EdgeType) UpdateMetadata(gmd *GraphMetadata) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside EdgeType:UpdateMetadata, updated base entity type's Attributes"))
+		logger.Debug(fmt.Sprint("Inside EdgeType:UpdateMetadata, updated base entity type's Attributes"))
 	}
 	nType, nErr := gmd.GetNodeTypeById(obj.fromTypeId)
 	if nErr == nil {
@@ -2105,7 +2101,7 @@ func (obj *EdgeType) UpdateMetadata(gmd *GraphMetadata) tgdb.TGError {
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning EdgeType:UpdateMetadata w/ NO error, for EdgeType: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning EdgeType:UpdateMetadata w/ NO error, for EdgeType: '%+v'", obj))
 	}
 	return nil
 }
@@ -2219,9 +2215,9 @@ func (obj *EdgeType) String() string {
 	buffer.WriteString(fmt.Sprintf(", ToTypeId: %+v", obj.toTypeId))
 	buffer.WriteString(fmt.Sprintf(", ToNodeType: %+v", obj.toNodeType))
 	buffer.WriteString(fmt.Sprintf(", NumEntries: %+v", obj.numEntries))
-	strArray := []string{buffer.String(), obj.entityTypeToString()+"}"}
+	strArray := []string{buffer.String(), obj.entityTypeToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
-	return  msgStr
+	return msgStr
 }
 
 /////////////////////////////////////////////////////////////////
@@ -2245,7 +2241,7 @@ func (obj *EdgeType) GetSystemType() tgdb.TGSystemType {
 // ReadExternal reads the byte format from an external input stream and constructs a system object
 func (obj *EdgeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering EdgeType:ReadExternal"))
+		logger.Debug(fmt.Sprint("Entering EdgeType:ReadExternal"))
 	}
 	// Base Class EntityType's ReadExternal()
 	err := EntityTypeReadExternal(obj, is)
@@ -2253,7 +2249,7 @@ func (obj *EdgeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside EdgeType:ReadExternal, read base entity type's Attributes"))
+		logger.Debug(fmt.Sprint("Inside EdgeType:ReadExternal, read base entity type's Attributes"))
 	}
 
 	fromTypeId, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -2262,7 +2258,7 @@ func (obj *EdgeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read fromTypeId as '%d'", fromTypeId))
+		logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read fromTypeId as '%d'", fromTypeId))
 	}
 
 	toTypeId, err := is.(*ProtocolDataInputStream).ReadInt()
@@ -2271,7 +2267,7 @@ func (obj *EdgeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read toTypeId as '%d'", toTypeId))
+		logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read toTypeId as '%d'", toTypeId))
 	}
 
 	direction, err := is.(*ProtocolDataInputStream).ReadByte()
@@ -2280,7 +2276,7 @@ func (obj *EdgeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read direction as '%+v'", direction))
+		logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read direction as '%+v'", direction))
 	}
 	if direction == 0 {
 		obj.SetDirectionType(tgdb.DirectionTypeUnDirected)
@@ -2296,14 +2292,14 @@ func (obj *EdgeType) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 		return err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read numEntries as '%d'", numEntries))
+		logger.Debug(fmt.Sprintf("Inside EdgeType:ReadExternal read numEntries as '%d'", numEntries))
 	}
 
 	obj.SetFromTypeId(fromTypeId)
 	obj.SetToTypeId(toTypeId)
 	obj.SetNumEntries(numEntries)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning EdgeType:ReadExternal w/ NO error, for entityType: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning EdgeType:ReadExternal w/ NO error, for entityType: '%+v'", obj))
 	}
 	return nil
 }
@@ -2436,7 +2432,7 @@ func (obj *ByteArrayEntity) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 	}
 	obj.entityId = entityId
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning ByteArrayEntity:ReadExternal w/ NO error, for entity: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning ByteArrayEntity:ReadExternal w/ NO error, for entity: '%+v'", obj))
 	}
 	return nil
 }
@@ -2446,7 +2442,6 @@ func (obj *ByteArrayEntity) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 	//logger.Log(fmt.Sprintf("Exported ByteArrayEntity object as '%+v' from byte format", obj))
 	return os.(*ProtocolDataOutputStream).WriteBytes(obj.entityId)
 }
-
 
 type CompositeKey struct {
 	graphMetadata *GraphMetadata
@@ -2495,7 +2490,7 @@ func (obj *CompositeKey) SetKeyName(name string) {
 // Dynamically set the attribute to this entity. If the AttributeDescriptor doesn't exist in the database, create a new one.
 func (obj *CompositeKey) SetOrCreateAttribute(name string, value interface{}) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering CompositeKey:SetOrCreateAttribute w/ N-V Pair as '%+v'='%+v'", name, value))
+		logger.Debug(fmt.Sprintf("Entering CompositeKey:SetOrCreateAttribute w/ N-V Pair as '%+v'='%+v'", name, value))
 	}
 	if name == "" || value == nil {
 		logger.Error(fmt.Sprint("ERROR: Returning CompositeKey:SetOrCreateAttribute as either Name or value is EMPTY"))
@@ -2506,7 +2501,7 @@ func (obj *CompositeKey) SetOrCreateAttribute(name string, value interface{}) tg
 	attr := obj.attributes[name]
 	if attr == nil {
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CompositeKey:SetOrCreateAttribute attribute '%+v' not found - trying to get descriptor from GraphMetadata", name))
+			logger.Debug(fmt.Sprintf("Inside CompositeKey:SetOrCreateAttribute attribute '%+v' not found - trying to get descriptor from GraphMetadata", name))
 		}
 		attrDesc, err := obj.graphMetadata.GetAttributeDescriptor(name)
 		if err != nil {
@@ -2514,12 +2509,12 @@ func (obj *CompositeKey) SetOrCreateAttribute(name string, value interface{}) tg
 			return err
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside CompositeKey:SetOrCreateAttribute attribute descriptor for '%+v' found in GraphMetadata", name))
+			logger.Debug(fmt.Sprintf("Inside CompositeKey:SetOrCreateAttribute attribute descriptor for '%+v' found in GraphMetadata", name))
 		}
 		if attrDesc == nil {
 			aType := reflect.TypeOf(value).String()
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("=======> Inside CompositeKey SetOrCreateAttribute creating new attribute descriptor '%+v':'%+v'(%+v) <=======", name, value, aType))
+				logger.Debug(fmt.Sprintf("=======> Inside CompositeKey SetOrCreateAttribute creating new attribute descriptor '%+v':'%+v'(%+v) <=======", name, value, aType))
 			}
 			attrDesc = obj.graphMetadata.CreateAttributeDescriptorForDataType(name, aType)
 		}
@@ -2532,7 +2527,7 @@ func (obj *CompositeKey) SetOrCreateAttribute(name string, value interface{}) tg
 		attr = newAttr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside CompositeKey:SetOrCreateAttribute trying to set attribute '%+v' value as '%+v'", attr, value))
+		logger.Debug(fmt.Sprintf("Inside CompositeKey:SetOrCreateAttribute trying to set attribute '%+v' value as '%+v'", attr, value))
 	}
 	// Set the attribute value
 	err := attr.SetValue(value)
@@ -2543,7 +2538,7 @@ func (obj *CompositeKey) SetOrCreateAttribute(name string, value interface{}) tg
 	// Add it to the set
 	obj.attributes[name] = attr
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning CompositeKey:SetOrCreateAttribute w/ Key as '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning CompositeKey:SetOrCreateAttribute w/ Key as '%+v'", obj))
 	}
 	return nil
 }
@@ -2580,7 +2575,7 @@ func (obj *CompositeKey) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning CompositeKey:WriteExternal w/ NO error, for key: '%+v'", obj))
+		logger.Debug(fmt.Sprintf("Returning CompositeKey:WriteExternal w/ NO error, for key: '%+v'", obj))
 	}
 	return nil
 }

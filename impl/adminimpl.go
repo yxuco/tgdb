@@ -27,7 +27,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"tgdb"
+	"github.com/yxuco/tgdb"
 	"time"
 )
 

@@ -23,7 +23,8 @@ package impl
 
 import (
 	"fmt"
-	"tgdb"
+
+	"github.com/yxuco/tgdb"
 )
 
 /////////////////////////////////////////////////////////////////
@@ -48,20 +49,20 @@ const (
 	TGErrorInvalidErrorCode
 	TGSuccess
 	TGQryError
-    TGQryProviderNotInitialized
-    TGQryParsingError
-    TGQryStepNotSupported
-    TGQryStepNotAllowed
-    TGQryStepArgMissing
-    TGQryStepArgNotSupported
-    TGQryStepMissing
-    TGQryNotDefined
-    TGQryAttrDescNotFound
-    TGQryEdgeTypeNotFound
-    TGQryNodeTypeNotFound
-    TGQryInternalDataMismatchError
-    TGQryStepSignatureNotSupported
-    TGQryInvalidDataType
+	TGQryProviderNotInitialized
+	TGQryParsingError
+	TGQryStepNotSupported
+	TGQryStepNotAllowed
+	TGQryStepArgMissing
+	TGQryStepArgNotSupported
+	TGQryStepMissing
+	TGQryNotDefined
+	TGQryAttrDescNotFound
+	TGQryEdgeTypeNotFound
+	TGQryNodeTypeNotFound
+	TGQryInternalDataMismatchError
+	TGQryStepSignatureNotSupported
+	TGQryInvalidDataType
 )
 
 const (
@@ -84,14 +85,13 @@ const (
 )
 
 type TGDBError struct {
-	ErrorCode    string
-	ErrorType    int
-	ErrorMsg     string
-	ErrorDetails string
+	ErrorCode            string
+	ErrorType            int
+	ErrorMsg             string
+	ErrorDetails         string
 	ErrorServerErrorCode int
 	//ErrorTimestamp  int64
 }
-
 
 func (e *TGDBError) GetErrorCode() string {
 	return e.ErrorCode
@@ -113,30 +113,29 @@ func (e *TGDBError) GetServerErrorCode() int {
 	return e.ErrorServerErrorCode
 }
 
-
 // Code message map containing all code messages with the code as key
 var PreDefinedErrors = map[int]TGDBError{
-	TGErrorBadVerb:                  {ErrorCode: "TGErrorBadVerb", ErrorType: TGErrorBadVerb, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorInvalidMessageLength:     {ErrorCode: "TGErrorInvalidMessageLength", ErrorType: TGErrorInvalidMessageLength, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorBadMagic:                 {ErrorCode: "TGErrorBadMagic", ErrorType: TGErrorBadMagic, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorProtocolNotSupported:     {ErrorCode: "TGErrorProtocolNotSupported", ErrorType: TGErrorProtocolNotSupported, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorBadAuthentication:        {ErrorCode: "TGErrorBadAuthentication", ErrorType: TGErrorBadAuthentication, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorIOException:              {ErrorCode: "TGErrorIOException", ErrorType: TGErrorIOException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorConnectionTimeout:        {ErrorCode: "TGErrorConnectionTimeout", ErrorType: TGErrorConnectionTimeout, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorGeneralException:         {ErrorCode: "TGErrorGeneralException", ErrorType: TGErrorGeneralException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorRetryIOException:         {ErrorCode: "TGErrorRetryIOException", ErrorType: TGErrorRetryIOException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorChannelDisconnected:      {ErrorCode: "TGErrorChannelDisconnected", ErrorType: TGErrorChannelDisconnected, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorSecurityException:        {ErrorCode: "TGErrorSecurityException", ErrorType: TGErrorSecurityException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorTransactionException:     {ErrorCode: "TGErrorTransactionException", ErrorType: TGErrorTransactionException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorTypeCoercionNotSupported: {ErrorCode: "TGErrorTypeCoercionNotSupported", ErrorType: TGErrorTypeCoercionNotSupported, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorTypeNotSupported:         {ErrorCode: "TGErrorTypeNotSupported", ErrorType: TGErrorTypeNotSupported, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorVersionMismatchException: {ErrorCode: "TGErrorVersionMismatchException", ErrorType: TGErrorVersionMismatchException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGErrorInvalidErrorCode:         {ErrorCode: "TGErrorInvalidErrorCode", ErrorType: TGErrorInvalidErrorCode, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
-	TGSuccess:                       {ErrorCode: "TGSuccess", ErrorType: TGSuccess, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1},
+	TGErrorBadVerb:                  {ErrorCode: "TGErrorBadVerb", ErrorType: TGErrorBadVerb, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorInvalidMessageLength:     {ErrorCode: "TGErrorInvalidMessageLength", ErrorType: TGErrorInvalidMessageLength, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorBadMagic:                 {ErrorCode: "TGErrorBadMagic", ErrorType: TGErrorBadMagic, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorProtocolNotSupported:     {ErrorCode: "TGErrorProtocolNotSupported", ErrorType: TGErrorProtocolNotSupported, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorBadAuthentication:        {ErrorCode: "TGErrorBadAuthentication", ErrorType: TGErrorBadAuthentication, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorIOException:              {ErrorCode: "TGErrorIOException", ErrorType: TGErrorIOException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorConnectionTimeout:        {ErrorCode: "TGErrorConnectionTimeout", ErrorType: TGErrorConnectionTimeout, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorGeneralException:         {ErrorCode: "TGErrorGeneralException", ErrorType: TGErrorGeneralException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorRetryIOException:         {ErrorCode: "TGErrorRetryIOException", ErrorType: TGErrorRetryIOException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorChannelDisconnected:      {ErrorCode: "TGErrorChannelDisconnected", ErrorType: TGErrorChannelDisconnected, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorSecurityException:        {ErrorCode: "TGErrorSecurityException", ErrorType: TGErrorSecurityException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorTransactionException:     {ErrorCode: "TGErrorTransactionException", ErrorType: TGErrorTransactionException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorTypeCoercionNotSupported: {ErrorCode: "TGErrorTypeCoercionNotSupported", ErrorType: TGErrorTypeCoercionNotSupported, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorTypeNotSupported:         {ErrorCode: "TGErrorTypeNotSupported", ErrorType: TGErrorTypeNotSupported, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorVersionMismatchException: {ErrorCode: "TGErrorVersionMismatchException", ErrorType: TGErrorVersionMismatchException, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGErrorInvalidErrorCode:         {ErrorCode: "TGErrorInvalidErrorCode", ErrorType: TGErrorInvalidErrorCode, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
+	TGSuccess:                       {ErrorCode: "TGSuccess", ErrorType: TGSuccess, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1},
 }
 
 func DefaultTGDBError() *TGDBError {
-	newTGDBError := TGDBError{ErrorCode: "", ErrorType: TGSuccess, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode:-1}
+	newTGDBError := TGDBError{ErrorCode: "", ErrorType: TGSuccess, ErrorMsg: "", ErrorDetails: "", ErrorServerErrorCode: -1}
 	return &newTGDBError
 }
 
@@ -155,15 +154,9 @@ func NewTGDBErrorWithServerErrorCode(eCode string, eType int, eMsg, eDetails str
 	return newTGDBError
 }
 
-
 /////////////////////////////////////////////////////////////////
 // Helper functions for TGDBError
 /////////////////////////////////////////////////////////////////
-
-
-
-
-
 
 func GetPreDefinedErrors(code string) *TGDBError {
 	for _, tgError := range PreDefinedErrors {
@@ -175,7 +168,6 @@ func GetPreDefinedErrors(code string) *TGDBError {
 	return &invalid
 }
 
-
 /////////////////////////////////////////////////////////////////
 // Implement functions from Interface ==> error
 /////////////////////////////////////////////////////////////////
@@ -184,7 +176,6 @@ func (e *TGDBError) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
 
 // Create new exception instance based on the input type
 func CreateExceptionByType(excpTypeId int) tgdb.TGError {
@@ -310,7 +301,6 @@ func Error(excpTypeId int) string {
 	return tgDbError.Error()
 }
 
-
 type Success struct {
 	*TGDBError
 }
@@ -367,7 +357,6 @@ func (e *Success) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
 
 type BadAuthentication struct {
 	*TGDBError
@@ -446,7 +435,6 @@ func (e *BadAuthentication) Error() string {
 	return errMsg
 }
 
-
 type BadMagic struct {
 	*TGDBError
 }
@@ -503,8 +491,6 @@ func (e *BadMagic) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
-
 
 type BadVerb struct {
 	*TGDBError
@@ -563,7 +549,6 @@ func (e *BadVerb) Error() string {
 	return errMsg
 }
 
-
 type ChannelDisconnected struct {
 	*TGDBError
 }
@@ -620,8 +605,6 @@ func (e *ChannelDisconnected) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
-
 
 type ConnectionTimeout struct {
 	*TGDBError
@@ -680,7 +663,6 @@ func (e *ConnectionTimeout) Error() string {
 	return errMsg
 }
 
-
 type GeneralException struct {
 	*TGDBError
 }
@@ -713,7 +695,6 @@ func NewTGGeneralExceptionWithMsg(msg string) *GeneralException {
 // Implement functions from Interface ==> TGError
 /////////////////////////////////////////////////////////////////
 
-
 func (e *GeneralException) GetErrorCode() string {
 	return e.ErrorCode
 }
@@ -738,8 +719,6 @@ func (e *GeneralException) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
-
 
 type InvalidMessageLength struct {
 	*TGDBError
@@ -798,7 +777,6 @@ func (e *InvalidMessageLength) Error() string {
 	return errMsg
 }
 
-
 type IOException struct {
 	*TGDBError
 }
@@ -855,7 +833,6 @@ func (e *IOException) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
 
 type ProtocolNotSupported struct {
 	*TGDBError
@@ -914,7 +891,6 @@ func (e *ProtocolNotSupported) Error() string {
 	return errMsg
 }
 
-
 type RetryIOException struct {
 	*TGDBError
 }
@@ -972,7 +948,6 @@ func (e *RetryIOException) Error() string {
 	return errMsg
 }
 
-
 type SecurityException struct {
 	*TGDBError
 }
@@ -1029,8 +1004,6 @@ func (e *SecurityException) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
-
 
 type TransactionException struct {
 	*TGDBError
@@ -1467,7 +1440,6 @@ func (e *TGTransactionUniqueIndexKeyAttributeNullError) Error() string {
 	return errMsg
 }
 
-
 type TypeCoercionNotSupported struct {
 	*TGDBError
 }
@@ -1530,7 +1502,6 @@ func (e *TypeCoercionNotSupported) Error() string {
 	errMsg := fmt.Sprintf("ErrorCode: %s, ErrorType: %d, ErrorMessage: %s, ErrorDetails: %s", e.ErrorCode, e.ErrorType, e.ErrorMsg, e.ErrorDetails)
 	return errMsg
 }
-
 
 type TypeNotSupported struct {
 	*TGDBError
@@ -1595,7 +1566,6 @@ func (e *TypeNotSupported) Error() string {
 	return errMsg
 }
 
-
 type VersionMismatchException struct {
 	*TGDBError
 }
@@ -1659,16 +1629,13 @@ func (e *VersionMismatchException) Error() string {
 	return errMsg
 }
 
-
-
-
 ///////////////// Exception Handling for TGDBQuery related error
 type QueryError struct {
 	*TGDBError
 }
 
 func DefaultQueryError() *QueryError {
-	newException := QueryError {
+	newException := QueryError{
 		TGDBError: DefaultTGDBError(),
 	}
 	return &newException
@@ -1682,38 +1649,37 @@ func NewQueryError(eServerErrorCode int, eType int, eMsg string) *QueryError {
 	return newException
 }
 
-
-func buildQueryException(ts int, msg string, serverCode int ) *QueryError {
-	switch(ts) {
+func buildQueryException(ts int, msg string, serverCode int) *QueryError {
+	switch ts {
 	case TGQueryProviderNotInitialized:
 		return NewQueryError(serverCode, TGQryProviderNotInitialized, msg)
 	case TGQueryParsingError:
-		return NewQueryError(serverCode, TGQryParsingError, msg);
+		return NewQueryError(serverCode, TGQryParsingError, msg)
 	case TGQueryStepNotSupported:
-		return NewQueryError(serverCode, TGQryStepNotSupported, msg);
+		return NewQueryError(serverCode, TGQryStepNotSupported, msg)
 	case TGQueryStepNotAllowed:
-		return NewQueryError(serverCode, TGQryStepNotAllowed, msg);
+		return NewQueryError(serverCode, TGQryStepNotAllowed, msg)
 	case TGQueryStepArgMissing:
-		return NewQueryError(serverCode, TGQryStepArgMissing, msg);
+		return NewQueryError(serverCode, TGQryStepArgMissing, msg)
 	case TGQueryStepArgNotSupported:
-		return NewQueryError(serverCode, TGQryStepArgNotSupported, msg);
+		return NewQueryError(serverCode, TGQryStepArgNotSupported, msg)
 	case TGQueryStepMissing:
-		return NewQueryError(serverCode, TGQryStepMissing, msg);
+		return NewQueryError(serverCode, TGQryStepMissing, msg)
 	case TGQueryNotDefined:
-		return NewQueryError(serverCode, TGQryNotDefined, msg);
+		return NewQueryError(serverCode, TGQryNotDefined, msg)
 	case TGQueryAttrDescNotFound:
-		return NewQueryError(serverCode, TGQryAttrDescNotFound, msg);
+		return NewQueryError(serverCode, TGQryAttrDescNotFound, msg)
 	case TGQueryEdgeTypeNotFound:
-		return NewQueryError(serverCode, TGQryEdgeTypeNotFound, msg);
+		return NewQueryError(serverCode, TGQryEdgeTypeNotFound, msg)
 	case TGQueryNodeTypeNotFound:
-		return NewQueryError(serverCode, TGQryNodeTypeNotFound, msg);
+		return NewQueryError(serverCode, TGQryNodeTypeNotFound, msg)
 	case TGQueryInternalDataMismatchError:
-		return NewQueryError(serverCode, TGQryInternalDataMismatchError, msg);
+		return NewQueryError(serverCode, TGQryInternalDataMismatchError, msg)
 	case TGQueryStepSignatureNotSupported:
-		return NewQueryError(serverCode, TGQryStepSignatureNotSupported, msg);
+		return NewQueryError(serverCode, TGQryStepSignatureNotSupported, msg)
 	case TGQueryInvalidDataType:
-		return NewQueryError(serverCode, TGQryInvalidDataType, msg);
+		return NewQueryError(serverCode, TGQryInvalidDataType, msg)
 	default:
-		return NewQueryError(serverCode, TGQryError, msg);
+		return NewQueryError(serverCode, TGQryError, msg)
 	}
 }

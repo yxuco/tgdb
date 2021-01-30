@@ -27,8 +27,9 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"tgdb"
 	"time"
+
+	"github.com/yxuco/tgdb"
 )
 
 type ResultSet struct {
@@ -37,7 +38,7 @@ type ResultSet struct {
 	isOpen     bool
 	resultId   int
 	ResultList []interface{}
-	MetaData	tgdb.TGResultSetMetaData
+	MetaData   tgdb.TGResultSetMetaData
 }
 
 func DefaultResultSet() *ResultSet {
@@ -51,7 +52,7 @@ func DefaultResultSet() *ResultSet {
 		isOpen:     true,
 		resultId:   -1,
 		ResultList: make([]interface{}, 0),
-		MetaData: nil,
+		MetaData:   nil,
 	}
 	return &newResults
 }
@@ -177,7 +178,7 @@ func (obj *ResultSet) HasNext() bool {
 	}
 	if len(obj.ResultList) == 0 {
 		return false
-	} else if obj.currPos < (len(obj.ResultList)-1) {
+	} else if obj.currPos < (len(obj.ResultList) - 1) {
 		return true
 	}
 	return false
@@ -190,7 +191,7 @@ func (obj *ResultSet) Next() interface{} {
 	}
 	if len(obj.ResultList) == 0 {
 		return nil
-	} else if obj.currPos < (len(obj.ResultList)-1) {
+	} else if obj.currPos < (len(obj.ResultList) - 1) {
 		obj.currPos++
 		return obj.ResultList[obj.currPos]
 	}
@@ -271,7 +272,6 @@ func (obj *ResultSet) UnmarshalBinary(data []byte) error {
 func (obj *ResultSet) GetMetadata() tgdb.TGResultSetMetaData {
 	return obj.MetaData
 }
-
 
 // ======= Various Element Types for Gremlin Results =======
 type ElementType int
@@ -379,7 +379,7 @@ func ConstructList(entityStream tgdb.TGInputStream, gof tgdb.TGGraphObjectFactor
 		dummyNode = node1
 	}
 
-	for i:=0; i<size; i++ {
+	for i := 0; i < size; i++ {
 		if ElementType(eleType) == ElementTypeEntity {
 			entityType, err := entityStream.(*ProtocolDataInputStream).ReadByte()
 			if err != nil {
@@ -447,7 +447,7 @@ func ConstructList(entityStream tgdb.TGInputStream, gof tgdb.TGGraphObjectFactor
 		} else {
 			logger.Error(fmt.Sprintf("ERROR: Returning GremlinResult:ConstructList - Invalid element type '%+v' from Gremlin response stream", eleType))
 		}
-	}	// End of for loop
+	} // End of for loop
 
 	if logger.IsDebug() {
 		logger.Debug(fmt.Sprint("Returning GremlinResult:ConstructList"))
@@ -469,7 +469,7 @@ func ConstructMap(entityStream tgdb.TGInputStream, gof tgdb.TGGraphObjectFactory
 		logger.Debug(fmt.Sprintf("Inside Returning GremlinResult:FillCollection extracted size: '%+v'", size))
 	}
 
-	for i:=0; i<size; i++ {
+	for i := 0; i < size; i++ {
 		key, err := entityStream.(*ProtocolDataInputStream).ReadUTF()
 		if err != nil {
 			logger.Error(fmt.Sprintf("ERROR: Returning GremlinResult:ConstructMap  - unable to read key in the response stream w/ error: '%s'", err.Error()))
@@ -568,14 +568,13 @@ func ConstructMap(entityStream tgdb.TGInputStream, gof tgdb.TGGraphObjectFactory
 			_ = ConstructMap(entityStream, gof, mapElem)
 			colMap[key] = mapElem
 		}
-	}	// End of for loop
+	} // End of for loop
 
 	if logger.IsDebug() {
 		logger.Debug(fmt.Sprint("Returning GremlinResult:ConstructMap"))
 	}
 	return nil
 }
-
 
 //var logger = logging.DefaultTGLogManager().GetLogger()
 
@@ -767,8 +766,6 @@ func (obj *TGQueryImpl) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 const (
 	DefaultPrefetchSize    = 1000
 	DefaultTraversalDepth  = 3
@@ -781,7 +778,7 @@ const (
 	OptionQueryTraversalDepth = "traversaldepth"
 	OptionQueryEdgeLimit      = "edgelimit"
 	OptionQuerySortAttr       = "sortattrname"
-	OptionQuerySortOrder      = "sortorder"			// 0 - asc, 1 - dsc
+	OptionQuerySortOrder      = "sortorder" // 0 - asc, 1 - dsc
 	OptionQuerySortLimit      = "sortresultlimit"
 )
 
@@ -825,7 +822,7 @@ func (obj *TGQueryOptionImpl) preloadQueryOptions() {
 	obj.AddProperty(OptionQueryTraversalDepth, strconv.Itoa(DefaultTraversalDepth))
 	obj.AddProperty(OptionQueryEdgeLimit, strconv.Itoa(DefaultEdgeLimit))
 	obj.AddProperty(OptionQuerySortAttr, "")
-	obj.AddProperty(OptionQuerySortOrder, "0")	// Ascending Order
+	obj.AddProperty(OptionQuerySortOrder, "0") // Ascending Order
 	obj.AddProperty(OptionQuerySortLimit, strconv.Itoa(DefaultOptionSortLimit))
 }
 
@@ -1100,115 +1097,113 @@ func (obj *TGQueryOptionImpl) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 type ResultDataDescriptor struct {
-	DataType int
-	Annot string
-	IsItMap bool
-	IsItArray bool
-	HasType bool
+	DataType      int
+	Annot         string
+	IsItMap       bool
+	IsItArray     bool
+	HasType       bool
 	ContainedSize int
-	ScalarType int
-	SysObject tgdb.TGSystemObject
-	KeyDesc tgdb.TGResultDataDescriptor
-	ValueDesc tgdb.TGResultDataDescriptor
+	ScalarType    int
+	SysObject     tgdb.TGSystemObject
+	KeyDesc       tgdb.TGResultDataDescriptor
+	ValueDesc     tgdb.TGResultDataDescriptor
 	ContainedDesc []tgdb.TGResultDataDescriptor
 }
 
-func (obj* ResultDataDescriptor) GetDataType() int {
+func (obj *ResultDataDescriptor) GetDataType() int {
 	return obj.DataType
 }
 
-func (obj* ResultDataDescriptor) GetContainedDataSize() int {
+func (obj *ResultDataDescriptor) GetContainedDataSize() int {
 	return obj.ContainedSize
 }
 
-func (obj* ResultDataDescriptor) IsMap() bool {
+func (obj *ResultDataDescriptor) IsMap() bool {
 	return obj.IsItMap
 }
 
-func (obj* ResultDataDescriptor) IsArray() bool {
+func (obj *ResultDataDescriptor) IsArray() bool {
 	return obj.IsItArray
 }
 
-func (obj* ResultDataDescriptor) HasConcreteType() bool {
+func (obj *ResultDataDescriptor) HasConcreteType() bool {
 	return obj.HasType
 }
 
-func (obj* ResultDataDescriptor) GetScalarType() int {
+func (obj *ResultDataDescriptor) GetScalarType() int {
 	return obj.ScalarType
 }
 
-func (obj* ResultDataDescriptor) GetSystemObject() tgdb.TGSystemObject {
+func (obj *ResultDataDescriptor) GetSystemObject() tgdb.TGSystemObject {
 	return obj.SysObject
 }
 
-func (obj* ResultDataDescriptor) GetKeyDescriptor() tgdb.TGResultDataDescriptor {
+func (obj *ResultDataDescriptor) GetKeyDescriptor() tgdb.TGResultDataDescriptor {
 	return obj.KeyDesc
 }
 
-func (obj* ResultDataDescriptor) GetValueDescriptor() tgdb.TGResultDataDescriptor {
+func (obj *ResultDataDescriptor) GetValueDescriptor() tgdb.TGResultDataDescriptor {
 	return obj.ValueDesc
 }
 
-func (obj* ResultDataDescriptor) GetContainedDescriptors() []tgdb.TGResultDataDescriptor {
+func (obj *ResultDataDescriptor) GetContainedDescriptors() []tgdb.TGResultDataDescriptor {
 	return obj.ContainedDesc
 }
 
-func (obj* ResultDataDescriptor) GetContainedDescriptor(position int) tgdb.TGResultDataDescriptor {
+func (obj *ResultDataDescriptor) GetContainedDescriptor(position int) tgdb.TGResultDataDescriptor {
 	return obj.ContainedDesc[position]
 }
 
-
 ////////////// setters for ResultDataDescriptor
-func (obj* ResultDataDescriptor) SetDataType(dataType int) {
+func (obj *ResultDataDescriptor) SetDataType(dataType int) {
 	obj.DataType = dataType
 }
 
-func (obj* ResultDataDescriptor) SetContainedDataSize(dataSize int) {
+func (obj *ResultDataDescriptor) SetContainedDataSize(dataSize int) {
 	obj.ContainedSize = dataSize
 }
 
-func (obj* ResultDataDescriptor) SetIsMap(isMap bool) {
+func (obj *ResultDataDescriptor) SetIsMap(isMap bool) {
 	obj.IsItMap = isMap
 }
 
-func (obj* ResultDataDescriptor) SetIsArray(isArray bool) {
+func (obj *ResultDataDescriptor) SetIsArray(isArray bool) {
 	obj.IsItArray = isArray
 }
 
-func (obj* ResultDataDescriptor) SetHasConcreteType(hasType bool) {
+func (obj *ResultDataDescriptor) SetHasConcreteType(hasType bool) {
 	obj.HasType = hasType
 }
 
-func (obj* ResultDataDescriptor) SetScalarType(scalarType int) {
+func (obj *ResultDataDescriptor) SetScalarType(scalarType int) {
 	obj.ScalarType = scalarType
 }
 
-func (obj* ResultDataDescriptor) SetSystemObject(sysObject tgdb.TGSystemObject) {
+func (obj *ResultDataDescriptor) SetSystemObject(sysObject tgdb.TGSystemObject) {
 	obj.SysObject = sysObject
 }
 
-func (obj* ResultDataDescriptor) SetKeyDescriptor(keyDesc tgdb.TGResultDataDescriptor) {
+func (obj *ResultDataDescriptor) SetKeyDescriptor(keyDesc tgdb.TGResultDataDescriptor) {
 	obj.KeyDesc = keyDesc
 }
 
-func (obj* ResultDataDescriptor) SetValueDescriptor(valueDesc tgdb.TGResultDataDescriptor) {
+func (obj *ResultDataDescriptor) SetValueDescriptor(valueDesc tgdb.TGResultDataDescriptor) {
 	obj.ValueDesc = valueDesc
 }
 
-func (obj* ResultDataDescriptor) SetContainedDescriptors(containedDesc []tgdb.TGResultDataDescriptor) {
+func (obj *ResultDataDescriptor) SetContainedDescriptors(containedDesc []tgdb.TGResultDataDescriptor) {
 	obj.ContainedDesc = containedDesc
 }
 
 ////////////// setters for ResultDataDescriptor
 
-func DefaultResultDataDescriptor () *ResultDataDescriptor {
+func DefaultResultDataDescriptor() *ResultDataDescriptor {
 	newResults := ResultDataDescriptor{
 		DataType:      tgdb.TYPE_NODE,
 		Annot:         "",
-		IsItMap:         false,
-		IsItArray:       false,
+		IsItMap:       false,
+		IsItArray:     false,
 		HasType:       false,
 		ContainedSize: 0,
 		ScalarType:    AttributeTypeInvalid,
@@ -1221,71 +1216,71 @@ func DefaultResultDataDescriptor () *ResultDataDescriptor {
 
 }
 
-func NewResultDataDescriptor (typeOfDataDescriptor int) *ResultDataDescriptor {
+func NewResultDataDescriptor(typeOfDataDescriptor int) *ResultDataDescriptor {
 	newResults := DefaultResultDataDescriptor()
 	newResults.DataType = typeOfDataDescriptor
 	return newResults
 }
 
-func NewResultDataDescriptorWithScalarAnnot (typeOfDataDescriptor int, scalarAnnot string) *ResultDataDescriptor {
+func NewResultDataDescriptorWithScalarAnnot(typeOfDataDescriptor int, scalarAnnot string) *ResultDataDescriptor {
 	newResults := NewResultDataDescriptor(typeOfDataDescriptor)
 	newResults.HasType = true
 
-	switch (scalarAnnot) {
+	switch scalarAnnot {
 	case "?":
-		newResults.ScalarType = AttributeTypeBoolean;
-		break;
+		newResults.ScalarType = AttributeTypeBoolean
+		break
 	case "b":
-		newResults.ScalarType = AttributeTypeByte;
-		break;
+		newResults.ScalarType = AttributeTypeByte
+		break
 	case "c":
-		newResults.ScalarType = AttributeTypeChar;
-		break;
+		newResults.ScalarType = AttributeTypeChar
+		break
 	case "h":
-		newResults.ScalarType = AttributeTypeShort;
-		break;
+		newResults.ScalarType = AttributeTypeShort
+		break
 	case "i":
-		newResults.ScalarType = AttributeTypeInteger;
-		break;
+		newResults.ScalarType = AttributeTypeInteger
+		break
 	case "l":
-		newResults.ScalarType = AttributeTypeLong;
-		break;
+		newResults.ScalarType = AttributeTypeLong
+		break
 	case "f":
-		newResults.ScalarType = AttributeTypeFloat;
-		break;
+		newResults.ScalarType = AttributeTypeFloat
+		break
 	case "d":
-		newResults.ScalarType = AttributeTypeDouble;
-		break;
+		newResults.ScalarType = AttributeTypeDouble
+		break
 	case "s":
-		newResults.ScalarType = AttributeTypeString;
-		break;
+		newResults.ScalarType = AttributeTypeString
+		break
 	case "D":
-		newResults.ScalarType = AttributeTypeDate;
-		break;
+		newResults.ScalarType = AttributeTypeDate
+		break
 	case "e":
-		newResults.ScalarType = AttributeTypeTime;
-		break;
+		newResults.ScalarType = AttributeTypeTime
+		break
 	case "a":
-		newResults.ScalarType = AttributeTypeTimeStamp;
-		break;
+		newResults.ScalarType = AttributeTypeTimeStamp
+		break
 	case "n":
-		newResults.ScalarType = AttributeTypeNumber;
-		break;
+		newResults.ScalarType = AttributeTypeNumber
+		break
 	default:
-		newResults.HasType = false;
-		break;
+		newResults.HasType = false
+		break
 	}
 	return newResults
 }
 
 type ResultSetMetadata struct {
-	ResultDataDescriptor* tgdb.TGResultDataDescriptor
-	ResultType int
-	Annot string
+	ResultDataDescriptor *tgdb.TGResultDataDescriptor
+	ResultType           int
+	Annot                string
 }
 
 /////////// Constructor Initialization starts
-func DefaultResultSetMetadata () *ResultSetMetadata {
+func DefaultResultSetMetadata() *ResultSetMetadata {
 	newResults := ResultSetMetadata{
 		ResultDataDescriptor: nil,
 		ResultType:           tgdb.TYPE_UNKNOWN,
@@ -1294,7 +1289,7 @@ func DefaultResultSetMetadata () *ResultSetMetadata {
 	return &newResults
 }
 
-func NewResultSetMetadataWithAnnot (annot string) *ResultSetMetadata {
+func NewResultSetMetadataWithAnnot(annot string) *ResultSetMetadata {
 	newResults := DefaultResultSetMetadata()
 	newResults.SetAnnot(annot)
 	return newResults
@@ -1302,15 +1297,15 @@ func NewResultSetMetadataWithAnnot (annot string) *ResultSetMetadata {
 
 /////////// Constructor Initialization end
 
-func (obj *ResultSetMetadata) SetAnnot (annot string) {
+func (obj *ResultSetMetadata) SetAnnot(annot string) {
 	obj.Annot = annot
 }
 
-func (obj *ResultSetMetadata) GetAnnot () string {
+func (obj *ResultSetMetadata) GetAnnot() string {
 	return obj.Annot
 }
 
-func (obj *ResultSetMetadata) GetResultDataDescriptor () *tgdb.TGResultDataDescriptor {
+func (obj *ResultSetMetadata) GetResultDataDescriptor() *tgdb.TGResultDataDescriptor {
 	return obj.ResultDataDescriptor
 }
 
@@ -1319,13 +1314,12 @@ func (obj *ResultSetMetadata) GetResultType() int {
 }
 
 func (obj *ResultSet) SetResultTypeAnnotation(annot string) tgdb.TGError {
-	if  len(annot) == 0 {
+	if len(annot) == 0 {
 		return nil
 	}
 
 	obj.MetaData = NewResultSetMetadataWithAnnot(annot)
 	gmd, err := obj.conn.GetGraphMetadata(false)
-
 
 	if err != nil {
 		logger.Error(fmt.Sprint("ERROR: Failed to initialize result set metadata"))
@@ -1336,8 +1330,8 @@ func (obj *ResultSet) SetResultTypeAnnotation(annot string) tgdb.TGError {
 	return nil
 }
 
-func (obj *ResultSetMetadata) Initialize(gmd tgdb.TGGraphMetadata)  {
-	/*ddesc*/obj.ResultDataDescriptor = obj.ConstructDataDescriptor(gmd, obj.GetAnnot())
+func (obj *ResultSetMetadata) Initialize(gmd tgdb.TGGraphMetadata) {
+	/*ddesc*/ obj.ResultDataDescriptor = obj.ConstructDataDescriptor(gmd, obj.GetAnnot())
 	obj.ResultType = (*obj.ResultDataDescriptor).GetDataType()
 	//obj.resultType = (*ddesc).GetDataType()
 }
@@ -1347,7 +1341,7 @@ func (obj *ResultSetMetadata) ConstructDataDescriptor(gmd tgdb.TGGraphMetadata, 
 		return nil
 	}
 
-	var desc tgdb.TGResultDataDescriptor;
+	var desc tgdb.TGResultDataDescriptor
 	desc = nil
 
 	startsWith := string(annot[0])
@@ -1360,16 +1354,16 @@ func (obj *ResultSetMetadata) ConstructDataDescriptor(gmd tgdb.TGGraphMetadata, 
 	case "E":
 		{
 			desc = NewResultDataDescriptor(tgdb.TYPE_EDGE)
-			break;
+			break
 		}
 	case "P":
 		{
-			desc = *obj.ConstructPathDataDescriptor(gmd, annot);
+			desc = *obj.ConstructPathDataDescriptor(gmd, annot)
 			break
 		}
 	case "S":
 		{
-			desc = NewResultDataDescriptor(tgdb.TYPE_SCALAR);
+			desc = NewResultDataDescriptor(tgdb.TYPE_SCALAR)
 			break
 		}
 	case "[":
@@ -1379,8 +1373,8 @@ func (obj *ResultSetMetadata) ConstructDataDescriptor(gmd tgdb.TGGraphMetadata, 
 			aDesc := make([]tgdb.TGResultDataDescriptor, 1)
 			aDesc[0] = *nDesc
 			desc.(*ResultDataDescriptor).SetContainedDescriptors(aDesc)
-			desc.(*ResultDataDescriptor).SetIsArray(true);
-			break;
+			desc.(*ResultDataDescriptor).SetIsArray(true)
+			break
 		}
 	case "{":
 		{
@@ -1390,12 +1384,12 @@ func (obj *ResultSetMetadata) ConstructDataDescriptor(gmd tgdb.TGGraphMetadata, 
 			desc.(*ResultDataDescriptor).SetKeyDescriptor(keyDesc)
 			desc.(*ResultDataDescriptor).SetValueDescriptor(valueDesc)
 			desc.(*ResultDataDescriptor).SetIsMap(true)
-			break;
+			break
 		}
 	case "(":
 		{
-			desc = NewResultDataDescriptor(tgdb.TYPE_TUPLE);
-			break;
+			desc = NewResultDataDescriptor(tgdb.TYPE_TUPLE)
+			break
 		}
 	case "?":
 	case "b":
@@ -1416,13 +1410,13 @@ func (obj *ResultSetMetadata) ConstructDataDescriptor(gmd tgdb.TGGraphMetadata, 
 		}
 	default:
 		//gLogger.log(TGLogger.TGLevel.Info, "Failed to initialize data descriptor with type annotation : %c", chars[0]);
-		break;
+		break
 	}
 	return &desc
 }
 
-func (obj *ResultSetMetadata) ConstructPathDataDescriptor (gmd tgdb.TGGraphMetadata, annot string) *tgdb.TGResultDataDescriptor {
-	var desc tgdb.TGResultDataDescriptor;
+func (obj *ResultSetMetadata) ConstructPathDataDescriptor(gmd tgdb.TGGraphMetadata, annot string) *tgdb.TGResultDataDescriptor {
+	var desc tgdb.TGResultDataDescriptor
 	desc = NewResultDataDescriptor(tgdb.TYPE_PATH)
 	data := strings.Split(annot[2:len(annot)-1], ",")
 	edesc := make([]tgdb.TGResultDataDescriptor, len(data))

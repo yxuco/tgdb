@@ -23,9 +23,10 @@ package impl
 
 import (
 	"os"
-	"tgdb"
 	"strconv"
 	"strings"
+
+	"github.com/yxuco/tgdb"
 )
 
 type TGEnvironment struct {

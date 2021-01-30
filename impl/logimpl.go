@@ -33,21 +33,21 @@ import (
 	"strconv"
 	"sync"
 	"syscall"
-	"tgdb"
 	"time"
+
+	"github.com/yxuco/tgdb"
 )
 
-
 type Logger struct {
-	depth int
-	level tgdb.LogLevel
-	log   *log.Logger
-	size int
-	count int
-	baseDir string
+	depth        int
+	level        tgdb.LogLevel
+	log          *log.Logger
+	size         int
+	count        int
+	baseDir      string
 	fileNameBase string
 	currentIndex int
-	mu     sync.Mutex
+	mu           sync.Mutex
 }
 
 func defaultLogger() *Logger {
@@ -69,7 +69,6 @@ func NewLogger(level int, logPrefix string, logWriter io.Writer, logFlags int) *
 	return ml
 }
 */
-
 
 /////////////////////////////////////////////////////////////////
 // Helper functions from Interface ==> Logger
@@ -127,7 +126,7 @@ func (m *Logger) IsTrace() bool {
 
 // Trace logs Trace (Down-to-the-wire) Statements
 func (m *Logger) Trace(logMsg string) {
-	callDepth := m.depth+1
+	callDepth := m.depth + 1
 	if m.level <= tgdb.TraceLog {
 		formattedLogMsg := m.formatMessage(callDepth, logMsg)
 		formattedLogMsg = " Trace " + formattedLogMsg
@@ -141,7 +140,7 @@ func (m *Logger) IsDebug() bool {
 
 // Debug logs Debug Statements
 func (m *Logger) Debug(logMsg string) {
-	callDepth := m.depth+1
+	callDepth := m.depth + 1
 	if m.level <= tgdb.DebugLog {
 		formattedLogMsg := m.formatMessage(callDepth, logMsg)
 		formattedLogMsg = " Debug " + formattedLogMsg
@@ -153,10 +152,9 @@ func (m *Logger) IsInfo() bool {
 	return m.level <= tgdb.InfoLog
 }
 
-
 // Info logs Informative Statements
 func (m *Logger) Info(logMsg string) {
-	callDepth := m.depth+1
+	callDepth := m.depth + 1
 	if m.level <= tgdb.InfoLog {
 		formattedLogMsg := m.formatMessage(callDepth, logMsg)
 		formattedLogMsg = " Info " + formattedLogMsg
@@ -168,10 +166,9 @@ func (m *Logger) IsWarning() bool {
 	return m.level <= tgdb.WarningLog
 }
 
-
 // Warning logs Warning Statements
 func (m *Logger) Warning(logMsg string) {
-	callDepth := m.depth+1
+	callDepth := m.depth + 1
 	if m.level <= tgdb.WarningLog {
 		formattedLogMsg := m.formatMessage(callDepth, logMsg)
 		formattedLogMsg = " Warning " + formattedLogMsg
@@ -179,14 +176,13 @@ func (m *Logger) Warning(logMsg string) {
 	}
 }
 
-
 func (m *Logger) IsError() bool {
 	return m.level <= tgdb.ErrorLog
 }
 
 // Error logs Error Statements
 func (m *Logger) Error(logMsg string) {
-	callDepth := m.depth+1
+	callDepth := m.depth + 1
 	if m.level <= tgdb.ErrorLog {
 		formattedLogMsg := m.formatMessage(callDepth, logMsg)
 		formattedLogMsg = " Error " + formattedLogMsg
@@ -196,7 +192,7 @@ func (m *Logger) Error(logMsg string) {
 
 // Fatal logs Fatal Statements
 func (m *Logger) Fatal(logMsg string) {
-	callDepth := m.depth+1
+	callDepth := m.depth + 1
 	if m.level <= tgdb.FatalLog {
 		formattedLogMsg := m.formatMessage(callDepth, logMsg)
 		formattedLogMsg = " Fatal " + formattedLogMsg
@@ -204,10 +200,10 @@ func (m *Logger) Fatal(logMsg string) {
 	}
 }
 
-func (m *Logger) formattedMsgOutput (formattedLogMsg string) {
+func (m *Logger) formattedMsgOutput(formattedLogMsg string) {
 	formattedLogMsg = m.formatTimeString() + formattedLogMsg
 	msgLength := len(formattedLogMsg)
-	if  msgLength == 0 || formattedLogMsg[msgLength-1] != '\n' {
+	if msgLength == 0 || formattedLogMsg[msgLength-1] != '\n' {
 		formattedLogMsg += "\n"
 	}
 	msgBytes := []byte(formattedLogMsg)
@@ -220,7 +216,7 @@ func (m *Logger) formattedMsgOutput (formattedLogMsg string) {
 	}
 }
 
-func (m *Logger) formatTimeString () string {
+func (m *Logger) formatTimeString() string {
 	current_time := time.Now()
 	var buff string
 	buff = fmt.Sprintf("%04d-%02d-%02dT%02d:%02d:%02d.%03d-00:00",
@@ -271,14 +267,14 @@ func (m *Logger) SetLogBaseDir(logBaseDr string) error {
 	if _, err := os.Stat(m.baseDir); os.IsNotExist(err) {
 		err = os.Mkdir(logBaseDr, 0777)
 		if err != nil {
-			fmt.Println ("Error: " + err.Error())
+			fmt.Println("Error: " + err.Error())
 			return err
 		}
 	}
 	return nil
 }
 
-func (m *Logger) GetLogBaseDir() (string) {
+func (m *Logger) GetLogBaseDir() string {
 	return m.baseDir
 }
 
@@ -288,7 +284,7 @@ func (m *Logger) SetFileNameBase(baseFileName string) error {
 }
 
 func (m *Logger) UpdateFileHandle() error {
-	logFileHandle, e := os.OpenFile(m.GetAbsoluteFileName(), os.O_CREATE | os.O_WRONLY | os.O_APPEND, 0777)
+	logFileHandle, e := os.OpenFile(m.GetAbsoluteFileName(), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0777)
 	if e != nil {
 		fmt.Println("Error: " + e.Error())
 		return e
@@ -297,13 +293,13 @@ func (m *Logger) UpdateFileHandle() error {
 	return nil
 }
 
-func (m *Logger) CheckAndUpdateFileHandle () error {
+func (m *Logger) CheckAndUpdateFileHandle() error {
 	absFileName := m.GetAbsoluteFileName()
 	fileInfo, err := os.Stat(absFileName)
 	if err != nil {
 		return err
 	}
-	if fileInfo.Size() < int64 (m.size) {
+	if fileInfo.Size() < int64(m.size) {
 		return nil
 	} else {
 		file := m.log.Writer().(*os.File)
@@ -312,7 +308,7 @@ func (m *Logger) CheckAndUpdateFileHandle () error {
 		if m.currentIndex >= m.count {
 			m.currentIndex = 0
 		}
-		m.removeIfExists ()
+		m.removeIfExists()
 		return m.UpdateFileHandle()
 	}
 }
@@ -324,7 +320,7 @@ func (m *Logger) removeIfExists() {
 	}
 }
 
-func (m *Logger) GetAbsoluteFileName () string {
+func (m *Logger) GetAbsoluteFileName() string {
 	return m.baseDir + string(os.PathSeparator) + m.fileNameBase + ".log." + strconv.Itoa(m.currentIndex)
 }
 
@@ -332,22 +328,21 @@ func (m *Logger) GetFileNameBase() string {
 	return m.fileNameBase
 }
 
-func (m *Logger) SetFileCount (count int) {
+func (m *Logger) SetFileCount(count int) {
 	m.count = count
 }
 
-func (m *Logger) GetFileCount () int {
+func (m *Logger) GetFileCount() int {
 	return m.count
 }
 
-func (m *Logger) SetFileSize (size int) {
+func (m *Logger) SetFileSize(size int) {
 	m.size = size
 }
 
-func (m *Logger) GetFileSize () int {
+func (m *Logger) GetFileSize() int {
 	return m.size
 }
-
 
 // Additional Method to help debugging
 func (m *Logger) String() string {
@@ -358,8 +353,6 @@ func (m *Logger) String() string {
 	buffer.WriteString("}")
 	return buffer.String()
 }
-
-
 
 //////////////////////////////////////////////
 // TGLogManager
@@ -419,6 +412,3 @@ func (m *TGLogManager) GetLogger() tgdb.TGLogger {
 func (m *TGLogManager) SetLogger(logger tgdb.TGLogger) {
 	m.logger = logger
 }
-
-
-

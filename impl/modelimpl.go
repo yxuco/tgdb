@@ -26,11 +26,11 @@ import (
 	"encoding/gob"
 	"fmt"
 	"strings"
-	"tgdb"
+
+	"github.com/yxuco/tgdb"
 )
 
 var logger = DefaultTGLogManager().GetLogger()
-
 
 type GraphMetadata struct {
 	initialized     bool
@@ -47,10 +47,6 @@ type GraphObjectFactory struct {
 	graphMData *GraphMetadata
 	connection tgdb.TGConnection
 }
-
-
-
-
 
 // TODO: Revisit later - Once SetAttributeViaDescriptor is properly implemented after discussing with TGDB Engineering Team
 func setAttributeViaDescriptor(obj tgdb.TGEntity, attrDesc *AttributeDescriptor, value interface{}) tgdb.TGError {
@@ -98,10 +94,6 @@ func setAttributeViaDescriptor(obj tgdb.TGEntity, attrDesc *AttributeDescriptor,
 	obj.(*AbstractEntity).Attributes[attrDesc.Name] = attr
 	return nil
 }
-
-
-
-
 
 func DefaultGraphMetadata() *GraphMetadata {
 	// We must register the concrete type for the encoder and decoder (which would
@@ -436,7 +428,6 @@ func (obj *GraphMetadata) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
 func DefaultGraphObjectFactory() *GraphObjectFactory {
 	// We must register the concrete type for the encoder and decoder (which would
 	// normally be on a separate machine from the encoder). On each end, this tells the
@@ -595,9 +586,6 @@ func (obj *GraphObjectFactory) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
-
 
 type Graph struct {
 	*Node
@@ -863,7 +851,7 @@ func (obj *Graph) String() string {
 	buffer.WriteString("Graph:{")
 	buffer.WriteString(fmt.Sprintf("Name: %+v", obj.name))
 	//buffer.WriteString(fmt.Sprintf(", Edges: %+v", obj.Edges))
-	strArray := []string{buffer.String(), obj.entityToString()+"}"}
+	strArray := []string{buffer.String(), obj.entityToString() + "}"}
 	msgStr := strings.Join(strArray, ", ")
 	return msgStr
 }
@@ -965,7 +953,7 @@ func (obj *Graph) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 	os.(*ProtocolDataOutputStream).WriteInt(newCount)
 	// Write the edges ids - ONLY include new edges
 	for _, edge := range obj.Edges {
-		if ! edge.GetIsNew() {
+		if !edge.GetIsNew() {
 			continue
 		}
 		os.(*ProtocolDataOutputStream).WriteLong(obj.GetVirtualId())
@@ -1017,9 +1005,6 @@ func (obj *Graph) UnmarshalBinary(data []byte) error {
 	}
 	return nil
 }
-
-
-
 
 type GraphManager struct {
 	name string
@@ -1099,6 +1084,3 @@ func (obj *GraphManager) Traverse(descriptor tgdb.TGTraversalDescriptor, startin
 func (obj *GraphManager) GetGraphMetadata() tgdb.TGGraphMetadata {
 	return nil
 }
-
-
-

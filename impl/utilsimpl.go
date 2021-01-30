@@ -29,12 +29,13 @@ import (
 	"math"
 	"math/big"
 	"math/rand"
-	"tgdb"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/yxuco/tgdb"
 )
 
 type TGServerVersion struct {
@@ -124,9 +125,6 @@ func (obj *TGServerVersion) GetVersionString() string {
 	return strVersion
 }
 
-
-
-
 const (
 	TgMajorVersion uint8 = 3
 	TgMinorVersion uint8 = 0
@@ -145,7 +143,6 @@ func GetProtocolVersion() uint16 {
 func IsCompatible(protocolVersion uint16) bool {
 	return protocolVersion == GetProtocolVersion()
 }
-
 
 /**
  * TODO: Revisit later - for more testing and optimization
@@ -462,7 +459,7 @@ func leftShift(d *internalDecimal, shiftPos uint) {
 
 // Delete this once leftShift is implemented and tested using correct logic
 func leftShiftFaulty(d *internalDecimal, shiftPos uint) {
-	r := d.usedDigits   			  // read position
+	r := d.usedDigits                 // read position
 	w := d.usedDigits + int(shiftPos) // write position
 
 	// Pick up a digit, put down a digit.
@@ -493,11 +490,11 @@ func leftShiftFaulty(d *internalDecimal, shiftPos uint) {
 		n = quo
 	}
 
-	d.usedDigits += int(shiftPos-n)
+	d.usedDigits += int(shiftPos - n)
 	if d.usedDigits >= len(d.digits) {
 		d.usedDigits = len(d.digits)
 	}
-	d.decPoint += int(shiftPos-n)
+	d.decPoint += int(shiftPos - n)
 	trim(d)
 }
 
@@ -1426,11 +1423,6 @@ func unquoteIfQuoted(value interface{}) (string, error) {
 	return string(bytes), nil
 }
 
-
-
-
-
-
 //var logger = logging.DefaultTGLogManager().GetLogger()
 
 type KvPair struct {
@@ -1709,8 +1701,6 @@ func (obj *SortedProperties) SetProperty(name, value string) {
 	orderedBy(obj, kvKey).Sort(obj.properties)
 }
 
-
-
 // SimpleStack is a basic LIFO stack that re-sizes as needed.
 type SimpleStack struct {
 	items []interface{}
@@ -1721,7 +1711,7 @@ type SimpleStack struct {
 func NewSimpleStack() *SimpleStack {
 	return &SimpleStack{
 		items: make([]interface{}, 0),
-		sLock:  &sync.Mutex{},
+		sLock: &sync.Mutex{},
 	}
 }
 
@@ -1755,7 +1745,6 @@ func (s *SimpleStack) Items() []interface{} {
 func (s *SimpleStack) Size() int {
 	return len(s.items)
 }
-
 
 // SimpleQueue is a basic FIFO queue based on a circular list that re-sizes as needed.
 type SimpleQueue struct {
@@ -1804,8 +1793,6 @@ func (q *SimpleQueue) Items() []interface{} {
 func (q *SimpleQueue) Len() int {
 	return len(q.values)
 }
-
-
 
 const (
 	NullString string = "0000"
@@ -1875,7 +1862,6 @@ func FormatHexToWriterInChunks(buf []byte, writer bytes.Buffer, lineLength int, 
 	} // End of for loop
 	return lineNo, nil
 }
-
 
 const (
 	OUTPUTDESIREDTSLAYOUT = time.RFC3339              // Format is same as TROPOS Log TS format i.e. yyyy-mm-ddTHH:MM:SSZ<TZ Diff>
@@ -2101,7 +2087,6 @@ func extractDurationUnitSuffix(d time.Duration) string {
 	return string(runes)
 }
 
-
 const (
 	ChannelDefaultHost = iota
 	ChannelDefaultPort
@@ -2149,21 +2134,21 @@ type ConfigName struct {
 }
 
 var PreDefinedConfigurations = map[int]ConfigName{
-	ChannelDefaultHost:                             {configPropName: "tgdb.channel.defaultHost", aliasName: "defaultHost", defaultValue: "localhost", description: "The default host specifier"},
-	ChannelDefaultPort:                             {configPropName: "tgdb.channel.defaultPort", aliasName: "defaultPort", defaultValue: "8700", description: "The default port specifier"},
-	ChannelDefaultProtocol:                         {configPropName: "tgdb.channel.defaultProtocol", aliasName: "defaultProtocol", defaultValue: "tcp", description: "The default protocol"},
-	ChannelSendSize:                                {configPropName: "tgdb.channel.sendSize", aliasName: "sendSize", defaultValue: "122", description: "TCP send packet size in KBs"},
-	ChannelRecvSize:                                {configPropName: "tgdb.channel.recvSize", aliasName: "recvSize", defaultValue: "128", description: "TCP recv packet size in KB"},
-	ChannelPingInterval:                            {configPropName: "tgdb.channel.pingInterval", aliasName: "pingInterval", defaultValue: "30", description: "Keep alive ping intervals"},
-	ChannelConnectTimeout:                          {configPropName: "tgdb.channel.connectTimeout", aliasName: "connectTimeout", defaultValue: "1000", description: "Timeout for connection to establish, before it gives up and tries the ftUrls if specified"}, //1 sec timeout
-	ChannelFTHosts:                                 {configPropName: "tgdb.channel.ftHosts", aliasName: "ftHosts", defaultValue: "", description: "Alternate fault tolerant list of &lt;host:port&gt; pair separated by comma"},
-	ChannelFTRetryIntervalSeconds:                  {configPropName: "tgdb.channel.ftRetryIntervalSeconds", aliasName: "ftRetryIntervalSeconds", defaultValue: "10", description: "The connect retry interval to ftHosts"},
-	ChannelFTRetryCount:                            {configPropName: "tgdb.channel.ftRetryCount", aliasName: "ftRetryCount", defaultValue: "3", description: "The number of times ro retry"},
-	ChannelDefaultUserID:                           {configPropName: "tgdb.channel.defaultUserID", aliasName: "defaultUserID", defaultValue: "", description: "The default user id for the connection"},
-	ChannelUserID:                                  {configPropName: "tgdb.channel.userID", aliasName: "userID", defaultValue: "", description: "The user id for the connection if it is not specified in the API. See the rules for picking the user Name"},
-	ChannelPassword:                                {configPropName: "tgdb.channel.password", aliasName: "password", defaultValue: "", description: "The password for the username"},
-	ChannelClientId:                                {configPropName: "tgdb.channel.clientId", aliasName: "clientId", defaultValue: "tgdb.go-api.client", description: "The client id to be used for the connection"},
-	ConnectionDatabaseName:                         {configPropName: "tgdb.connection.dbName", aliasName: "dbName", defaultValue: "", description: "The database Name the client is connecting to. It is used as part of verification for ssl channels"},
+	ChannelDefaultHost:            {configPropName: "tgdb.channel.defaultHost", aliasName: "defaultHost", defaultValue: "localhost", description: "The default host specifier"},
+	ChannelDefaultPort:            {configPropName: "tgdb.channel.defaultPort", aliasName: "defaultPort", defaultValue: "8700", description: "The default port specifier"},
+	ChannelDefaultProtocol:        {configPropName: "tgdb.channel.defaultProtocol", aliasName: "defaultProtocol", defaultValue: "tcp", description: "The default protocol"},
+	ChannelSendSize:               {configPropName: "tgdb.channel.sendSize", aliasName: "sendSize", defaultValue: "122", description: "TCP send packet size in KBs"},
+	ChannelRecvSize:               {configPropName: "tgdb.channel.recvSize", aliasName: "recvSize", defaultValue: "128", description: "TCP recv packet size in KB"},
+	ChannelPingInterval:           {configPropName: "tgdb.channel.pingInterval", aliasName: "pingInterval", defaultValue: "30", description: "Keep alive ping intervals"},
+	ChannelConnectTimeout:         {configPropName: "tgdb.channel.connectTimeout", aliasName: "connectTimeout", defaultValue: "1000", description: "Timeout for connection to establish, before it gives up and tries the ftUrls if specified"}, //1 sec timeout
+	ChannelFTHosts:                {configPropName: "tgdb.channel.ftHosts", aliasName: "ftHosts", defaultValue: "", description: "Alternate fault tolerant list of &lt;host:port&gt; pair separated by comma"},
+	ChannelFTRetryIntervalSeconds: {configPropName: "tgdb.channel.ftRetryIntervalSeconds", aliasName: "ftRetryIntervalSeconds", defaultValue: "10", description: "The connect retry interval to ftHosts"},
+	ChannelFTRetryCount:           {configPropName: "tgdb.channel.ftRetryCount", aliasName: "ftRetryCount", defaultValue: "3", description: "The number of times ro retry"},
+	ChannelDefaultUserID:          {configPropName: "tgdb.channel.defaultUserID", aliasName: "defaultUserID", defaultValue: "", description: "The default user id for the connection"},
+	ChannelUserID:                 {configPropName: "tgdb.channel.userID", aliasName: "userID", defaultValue: "", description: "The user id for the connection if it is not specified in the API. See the rules for picking the user Name"},
+	ChannelPassword:               {configPropName: "tgdb.channel.password", aliasName: "password", defaultValue: "", description: "The password for the username"},
+	ChannelClientId:               {configPropName: "tgdb.channel.clientId", aliasName: "clientId", defaultValue: "tgdb.go-api.client", description: "The client id to be used for the connection"},
+	ConnectionDatabaseName:        {configPropName: "tgdb.connection.dbName", aliasName: "dbName", defaultValue: "", description: "The database Name the client is connecting to. It is used as part of verification for ssl channels"},
 	ConnectionPoolUseDedicatedChannelPerConnection: {configPropName: "tgdb.connectionpool.useDedicatedChannelPerConnection", aliasName: "useDedicatedChannelPerConnection", defaultValue: "false", description: ""},
 	ConnectionPoolDefaultPoolSize:                  {configPropName: "tgdb.connectionpool.defaultPoolSize", aliasName: "defaultPoolSize", defaultValue: "10", description: "The default connection pool size to use when creating a ConnectionPool"},
 	//0 = mean immediate, Integer Max for indefinite

@@ -22,8 +22,8 @@
 package factory
 
 import (
-	"tgdb"
-	"tgdb/impl"
+	"github.com/yxuco/tgdb"
+	"github.com/yxuco/tgdb/impl"
 )
 
 func GetConnectionFactory() tgdb.TGConnectionFactory {

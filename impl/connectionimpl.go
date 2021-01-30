@@ -30,8 +30,9 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
-	"tgdb"
 	"time"
+
+	"github.com/yxuco/tgdb"
 )
 
 //
@@ -158,7 +159,7 @@ func (obj *TGDBConnection) SetConnectionProperties(connProps tgdb.TGProperties) 
 
 func fixUpAttrDescriptors(response *CommitTransactionResponse, attrDescSet []tgdb.TGAttributeDescriptor) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering TGDBConnection:fixUpAttrDescriptors"))
+		logger.Debug(fmt.Sprint("Entering TGDBConnection:fixUpAttrDescriptors"))
 	}
 	attrDescCount := response.GetAttrDescCount()
 	attrDescIdList := response.GetAttrDescIdList()
@@ -176,13 +177,13 @@ func fixUpAttrDescriptors(response *CommitTransactionResponse, attrDescSet []tgd
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:fixUpAttrDescriptors"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:fixUpAttrDescriptors"))
 	}
 }
 
 func fixUpEntities(obj tgdb.TGConnection, response *CommitTransactionResponse) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering TGDBConnection:fixUpEntities"))
+		logger.Debug(fmt.Sprint("Entering TGDBConnection:fixUpEntities"))
 	}
 	addedIdCount := response.GetAddedEntityCount()
 	addedIdList := response.GetAddedIdList()
@@ -217,7 +218,7 @@ func fixUpEntities(obj tgdb.TGConnection, response *CommitTransactionResponse) {
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:fixUpEntities"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:fixUpEntities"))
 	}
 }
 
@@ -425,7 +426,7 @@ func (obj *TGDBConnection) populateResultSetFromQueryResponse(resultId int, msgR
 		} // Valid entity types
 	} // End of for loop
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning TGDBConnection:populateResultSetFromQueryResponse w/ ResultSet: '%+v'", rSet))
+		logger.Debug(fmt.Sprintf("Returning TGDBConnection:populateResultSetFromQueryResponse w/ ResultSet: '%+v'", rSet))
 	}
 	return rSet, nil
 }
@@ -450,7 +451,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntitiesResponse(msgResponse 
 		return nil, GetErrorByType(TGErrorGeneralException, "", errMsg, err.Error())
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse extracted totalCount: '%d'", totalCount))
+		logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse extracted totalCount: '%d'", totalCount))
 	}
 	if totalCount > 0 {
 		respStream.SetReferenceMap(fetchedEntities)
@@ -474,7 +475,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntitiesResponse(msgResponse 
 			return nil, GetErrorByType(TGErrorGeneralException, "", errMsg, err.Error())
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse read isResult: '%+v'", isResult))
+			logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse read isResult: '%+v'", isResult))
 		}
 		entityType, err := respStream.(*ProtocolDataInputStream).ReadByte()
 		if err != nil {
@@ -484,7 +485,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntitiesResponse(msgResponse 
 		}
 		kindId := tgdb.TGEntityKind(entityType)
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
+			logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
 		}
 		if kindId != tgdb.EntityKindInvalid {
 			entityId, err := respStream.(*ProtocolDataInputStream).ReadLong()
@@ -495,7 +496,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntitiesResponse(msgResponse 
 			}
 			entity := fetchedEntities[entityId]
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
+				logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
 			}
 			switch kindId {
 			case tgdb.EntityKindNode:
@@ -512,7 +513,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntitiesResponse(msgResponse 
 					entity = node
 					fetchedEntities[entityId] = node
 					if logger.IsDebug() {
-											logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse created new node: '%+v'", node))
+						logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse created new node: '%+v'", node))
 					}
 				}
 				node = entity.(*Node)
@@ -540,7 +541,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntitiesResponse(msgResponse 
 					entity = edge
 					fetchedEntities[entityId] = edge
 					if logger.IsDebug() {
-											logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse created new edge: '%+v'", edge))
+						logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntitiesResponse created new edge: '%+v'", edge))
 					}
 				}
 				edge = entity.(*Edge)
@@ -563,14 +564,14 @@ func (obj *TGDBConnection) populateResultSetFromGetEntitiesResponse(msgResponse 
 		} // Valid entity types
 	} // End of for loop
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning TGDBConnection:populateResultSetFromGetEntitiesResponse w/ ResultSe: '%+v'", rSet))
+		logger.Debug(fmt.Sprintf("Returning TGDBConnection:populateResultSetFromGetEntitiesResponse w/ ResultSe: '%+v'", rSet))
 	}
 	return rSet, nil
 }
 
 func (obj *TGDBConnection) populateResultSetFromGetEntityResponse(msgResponse *GetEntityResponseMessage) (tgdb.TGEntity, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:populateResultSetFromGetEntityResponse w/ MsgResponse: '%+v'", msgResponse.String()))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:populateResultSetFromGetEntityResponse w/ MsgResponse: '%+v'", msgResponse.String()))
 	}
 	if !msgResponse.GetHasResult() {
 		logger.Error(fmt.Sprint("ERROR: Returning TGDBConnection:populateResultSetFromGetEntityResponse as msgResponse does not have any results"))
@@ -591,7 +592,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntityResponse(msgResponse *G
 		return nil, GetErrorByType(TGErrorGeneralException, "", errMsg, err.Error())
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse extracted Count: '%d'", count))
+		logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse extracted Count: '%d'", count))
 	}
 	if count > 0 {
 		respStream.SetReferenceMap(fetchedEntities)
@@ -604,7 +605,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntityResponse(msgResponse *G
 			}
 			kindId := tgdb.TGEntityKind(entityType)
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
+				logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
 			}
 			if kindId != tgdb.EntityKindInvalid {
 				entityId, err := respStream.(*ProtocolDataInputStream).ReadLong()
@@ -615,7 +616,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntityResponse(msgResponse *G
 				}
 				entity := fetchedEntities[entityId]
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
+					logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
 				}
 				switch kindId {
 				case tgdb.EntityKindNode:
@@ -636,7 +637,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntityResponse(msgResponse *G
 							entityFound = node
 						}
 						if logger.IsDebug() {
-													logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse created new node: '%+v'", entity))
+							logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse created new node: '%+v'", entity))
 						}
 					}
 					node = entity.(*Node)
@@ -663,7 +664,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntityResponse(msgResponse *G
 							entityFound = edge
 						}
 						if logger.IsDebug() {
-													logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse created new edge: '%+v'", edge))
+							logger.Debug(fmt.Sprintf("Inside TGDBConnection::populateResultSetFromGetEntityResponse created new edge: '%+v'", edge))
 						}
 					}
 					edge = entity.(*Edge)
@@ -683,7 +684,7 @@ func (obj *TGDBConnection) populateResultSetFromGetEntityResponse(msgResponse *G
 		} // End of for loop
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning TGDBConnection:populateResultSetFromGetEntityResponse w/ Entity: '%+v'", entityFound))
+		logger.Debug(fmt.Sprintf("Returning TGDBConnection:populateResultSetFromGetEntityResponse w/ Entity: '%+v'", entityFound))
 	}
 	return entityFound, nil
 }
@@ -948,7 +949,7 @@ func (obj *TGDBConnection) CreateQuery(expr string) (tgdb.TGQuery, tgdb.TGError)
 // DecryptBuffer decrypts the encrypted buffer by sending a DecryptBufferRequest to the server
 func (obj *TGDBConnection) DecryptBuffer(is tgdb.TGInputStream) ([]byte, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering TGDBConnection:DecryptBuffer w/ EncryptedBuffer"))
+		logger.Debug(fmt.Sprint("Entering TGDBConnection:DecryptBuffer w/ EncryptedBuffer"))
 	}
 	//err := obj.InitMetadata()
 	//if err != nil {
@@ -1214,7 +1215,7 @@ func (obj *TGDBConnection) ExecuteQuery(expr string, options tgdb.TGQueryOption)
 // ExecuteTGDBQuery executes an immediate query with associated query options
 func (obj *TGDBConnection) ExecuteTGDBQuery(expr string, options tgdb.TGQueryOption) (tgdb.TGResultSet, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:ExecuteTGDBQuery for Query: '%+v'", expr))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:ExecuteTGDBQuery for Query: '%+v'", expr))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -1224,7 +1225,7 @@ func (obj *TGDBConnection) ExecuteTGDBQuery(expr string, options tgdb.TGQueryOpt
 	defer obj.connPoolImpl.AdminUnlock()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::ExecuteTGDBQuery about to createChannelRequest() for: VerbQueryRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::ExecuteTGDBQuery about to createChannelRequest() for: VerbQueryRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbQueryRequest)
@@ -1236,12 +1237,12 @@ func (obj *TGDBConnection) ExecuteTGDBQuery(expr string, options tgdb.TGQueryOpt
 	queryRequest.SetCommand(EXECUTE)
 	queryRequest.SetQuery(expr)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::ExecuteTGDBQuery about to obj.configureQueryRequest() for: VerbQueryRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::ExecuteTGDBQuery about to obj.configureQueryRequest() for: VerbQueryRequest"))
 	}
 	configureQueryRequest(queryRequest, options)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::ExecuteTGDBQuery about to obj.GetChannel().SendRequest() for: VerbQueryRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::ExecuteTGDBQuery about to obj.GetChannel().SendRequest() for: VerbQueryRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -1250,7 +1251,7 @@ func (obj *TGDBConnection) ExecuteTGDBQuery(expr string, options tgdb.TGQueryOpt
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside TGDBConnection::ExecuteTGDBQuery received response for: VerbQueryRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside TGDBConnection::ExecuteTGDBQuery received response for: VerbQueryRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*QueryResponseMessage)
 
@@ -1260,7 +1261,7 @@ func (obj *TGDBConnection) ExecuteTGDBQuery(expr string, options tgdb.TGQueryOpt
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning TGDBConnection:ExecuteTGDBQuery w/ '%+v'", response))
+		logger.Debug(fmt.Sprintf("Returning TGDBConnection:ExecuteTGDBQuery w/ '%+v'", response))
 	}
 	return obj.populateResultSetFromQueryResponse(0, response)
 }
@@ -1401,7 +1402,7 @@ func (obj *TGDBConnection) GetConnectionProperties() tgdb.TGProperties {
 // GetEntities gets a result set of entities given an non-uniqueKey
 func (obj *TGDBConnection) GetEntities(qryKey tgdb.TGKey, props tgdb.TGProperties) (tgdb.TGResultSet, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:GetEntities for QueryKey: '%+v'", qryKey))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:GetEntities for QueryKey: '%+v'", qryKey))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -1415,7 +1416,7 @@ func (obj *TGDBConnection) GetEntities(qryKey tgdb.TGKey, props tgdb.TGPropertie
 		props = NewQueryOption()
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntities about to createChannelRequest() for: VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntities about to createChannelRequest() for: VerbGetEntityRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbGetEntityRequest)
@@ -1429,7 +1430,7 @@ func (obj *TGDBConnection) GetEntities(qryKey tgdb.TGKey, props tgdb.TGPropertie
 	configureGetRequest(queryRequest, props)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntities about to obj.GetChannel().SendRequest() for: VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntities about to obj.GetChannel().SendRequest() for: VerbGetEntityRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -1438,7 +1439,7 @@ func (obj *TGDBConnection) GetEntities(qryKey tgdb.TGKey, props tgdb.TGPropertie
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetEntities received response for: VerbGetEntityRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetEntities received response for: VerbGetEntityRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*GetEntityResponseMessage)
 
@@ -1448,7 +1449,7 @@ func (obj *TGDBConnection) GetEntities(qryKey tgdb.TGKey, props tgdb.TGPropertie
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning TGDBConnection:GetEntities w/ '%+v'", response))
+		logger.Debug(fmt.Sprintf("Returning TGDBConnection:GetEntities w/ '%+v'", response))
 	}
 	return obj.populateResultSetFromGetEntitiesResponse(response)
 }
@@ -1456,7 +1457,7 @@ func (obj *TGDBConnection) GetEntities(qryKey tgdb.TGKey, props tgdb.TGPropertie
 // GetEntity gets an Entity given an UniqueKey for the Object
 func (obj *TGDBConnection) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQueryOption) (tgdb.TGEntity, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:GetEntity for QueryKey: '%+v'", qryKey))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:GetEntity for QueryKey: '%+v'", qryKey))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -1470,7 +1471,7 @@ func (obj *TGDBConnection) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQueryOpti
 		options = NewQueryOption()
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntity about to createChannelRequest() for: VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntity about to createChannelRequest() for: VerbGetEntityRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbGetEntityRequest)
@@ -1484,7 +1485,7 @@ func (obj *TGDBConnection) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQueryOpti
 	configureGetRequest(queryRequest, options)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntity about to obj.GetChannel().SendRequest() for: VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::GetEntity about to obj.GetChannel().SendRequest() for: VerbGetEntityRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -1493,7 +1494,7 @@ func (obj *TGDBConnection) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQueryOpti
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetEntity received response for: VerbGetEntityRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetEntity received response for: VerbGetEntityRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*GetEntityResponseMessage)
 
@@ -1503,7 +1504,7 @@ func (obj *TGDBConnection) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQueryOpti
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning TGDBConnection:GetEntity w/ '%+v'", response))
+		logger.Debug(fmt.Sprintf("Returning TGDBConnection:GetEntity w/ '%+v'", response))
 	}
 	return obj.populateResultSetFromGetEntityResponse(response)
 }
@@ -1511,14 +1512,14 @@ func (obj *TGDBConnection) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQueryOpti
 // GetGraphMetadata gets the Graph Metadata
 func (obj *TGDBConnection) GetGraphMetadata(refresh bool) (tgdb.TGGraphMetadata, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering TGDBConnection:GetGraphMetadata"))
+		logger.Debug(fmt.Sprint("Entering TGDBConnection:GetGraphMetadata"))
 	}
 	if refresh {
 		obj.connPoolImpl.AdminLock()
 		defer obj.connPoolImpl.AdminUnlock()
 
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata about to createChannelRequest() for: VerbMetadataRequest"))
+			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata about to createChannelRequest() for: VerbMetadataRequest"))
 		}
 		// Create a channel request
 		msgRequest, channelResponse, err := createChannelRequest(obj, VerbMetadataRequest)
@@ -1528,11 +1529,11 @@ func (obj *TGDBConnection) GetGraphMetadata(refresh bool) (tgdb.TGGraphMetadata,
 		}
 		metaRequest := msgRequest.(*MetadataRequest)
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetGraphMetadata createChannelRequest() returned MsgRequest: '%+v' ChannelResponse: '%+v'", msgRequest, channelResponse.(*BlockingChannelResponse)))
+			logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetGraphMetadata createChannelRequest() returned MsgRequest: '%+v' ChannelResponse: '%+v'", msgRequest, channelResponse.(*BlockingChannelResponse)))
 		}
 
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata about to obj.GetChannel().SendRequest() for: VerbMetadataRequest"))
+			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata about to obj.GetChannel().SendRequest() for: VerbMetadataRequest"))
 		}
 		// Execute request on channel and get the response
 		msgResponse, channelErr := obj.GetChannel().SendRequest(metaRequest, channelResponse.(*BlockingChannelResponse))
@@ -1549,7 +1550,7 @@ func (obj *TGDBConnection) GetGraphMetadata(refresh bool) (tgdb.TGGraphMetadata,
 
 		gmd := obj.graphObjFactory.GetGraphMetaData()
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata about to update GraphMetadata"))
+			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata about to update GraphMetadata"))
 		}
 		uErr := gmd.UpdateMetadata(attrDescList, nodeTypeList, edgeTypeList)
 		if uErr != nil {
@@ -1557,11 +1558,11 @@ func (obj *TGDBConnection) GetGraphMetadata(refresh bool) (tgdb.TGGraphMetadata,
 			return nil, uErr
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata successfully updated GraphMetadata"))
+			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetGraphMetadata successfully updated GraphMetadata"))
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:GetGraphMetadata"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:GetGraphMetadata"))
 	}
 	return obj.graphObjFactory.GetGraphMetaData(), nil
 }
@@ -1569,7 +1570,7 @@ func (obj *TGDBConnection) GetGraphMetadata(refresh bool) (tgdb.TGGraphMetadata,
 // GetGraphObjectFactory gets the Graph Object Factory for Object creation
 func (obj *TGDBConnection) GetGraphObjectFactory() (tgdb.TGGraphObjectFactory, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering TGDBConnection:GetGraphObjectFactory"))
+		logger.Debug(fmt.Sprint("Entering TGDBConnection:GetGraphObjectFactory"))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -1577,7 +1578,7 @@ func (obj *TGDBConnection) GetGraphObjectFactory() (tgdb.TGGraphObjectFactory, t
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:GetGraphObjectFactory"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:GetGraphObjectFactory"))
 	}
 	return obj.graphObjFactory, nil
 }
@@ -1585,7 +1586,7 @@ func (obj *TGDBConnection) GetGraphObjectFactory() (tgdb.TGGraphObjectFactory, t
 // GetLargeObjectAsBytes gets an Binary Large Object Entity given an UniqueKey for the Object
 func (obj *TGDBConnection) GetLargeObjectAsBytes(entityId int64, decryptFlag bool) ([]byte, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:GetLargeObjectAsBytes for EntityId: '%+v'", entityId))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:GetLargeObjectAsBytes for EntityId: '%+v'", entityId))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -1596,7 +1597,7 @@ func (obj *TGDBConnection) GetLargeObjectAsBytes(entityId int64, decryptFlag boo
 	defer obj.connPoolImpl.AdminUnlock()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetLargeObjectAsBytes about to createChannelRequest() for: VerbGetLargeObjectRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::GetLargeObjectAsBytes about to createChannelRequest() for: VerbGetLargeObjectRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbGetLargeObjectRequest)
@@ -1609,7 +1610,7 @@ func (obj *TGDBConnection) GetLargeObjectAsBytes(entityId int64, decryptFlag boo
 	queryRequest.SetDecryption(decryptFlag)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside TGDBConnection::GetLargeObjectAsBytes about to obj.GetChannel().SendRequest() for: VerbGetLargeObjectRequest"))
+		logger.Debug(fmt.Sprint("Inside TGDBConnection::GetLargeObjectAsBytes about to obj.GetChannel().SendRequest() for: VerbGetLargeObjectRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -1618,7 +1619,7 @@ func (obj *TGDBConnection) GetLargeObjectAsBytes(entityId int64, decryptFlag boo
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetLargeObjectAsBytes received response for: VerbGetLargeObjectRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside TGDBConnection::GetLargeObjectAsBytes received response for: VerbGetLargeObjectRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*GetLargeObjectResponseMessage)
 
@@ -1629,7 +1630,7 @@ func (obj *TGDBConnection) GetLargeObjectAsBytes(entityId int64, decryptFlag boo
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning TGDBConnection:GetLargeObjectAsBytes w/ '%+v'", response.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning TGDBConnection:GetLargeObjectAsBytes w/ '%+v'", response.GetBuffer()))
 	}
 	return response.GetBuffer(), nil
 }
@@ -1642,11 +1643,11 @@ func (obj *TGDBConnection) GetRemovedList() map[int64]tgdb.TGEntity {
 // InsertEntity marks an ENTITY for insert operation. Upon commit, the entity will be inserted in the database
 func (obj *TGDBConnection) InsertEntity(entity tgdb.TGEntity) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:InsertEntity to insert Entity: '%+v'", entity.GetEntityType()))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:InsertEntity to insert Entity: '%+v'", entity.GetEntityType()))
 	}
 	obj.addedList[entity.GetVirtualId()] = entity
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:InsertEntity"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:InsertEntity"))
 	}
 	return nil
 }
@@ -1654,7 +1655,7 @@ func (obj *TGDBConnection) InsertEntity(entity tgdb.TGEntity) tgdb.TGError {
 // Rollback rolls back the current transaction on this connection
 func (obj *TGDBConnection) Rollback() tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering TGDBConnection:Rollback"))
+		logger.Debug(fmt.Sprint("Entering TGDBConnection:Rollback"))
 	}
 	obj.connPoolImpl.AdminLock()
 	defer obj.connPoolImpl.AdminUnlock()
@@ -1666,7 +1667,7 @@ func (obj *TGDBConnection) Rollback() tgdb.TGError {
 	obj.attrByTypeList = make(map[int][]tgdb.TGAttribute, 0)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:Rollback"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:Rollback"))
 	}
 	return nil
 }
@@ -1683,11 +1684,11 @@ func (obj *TGDBConnection) SetExceptionListener(listener tgdb.TGConnectionExcept
 // The same entity cannot be updated on multiple connections. It will result an TGException of already associated to a connection.
 func (obj *TGDBConnection) UpdateEntity(entity tgdb.TGEntity) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:UpdateEntity to update Entity: '%+v'", entity))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:UpdateEntity to update Entity: '%+v'", entity))
 	}
 	obj.changedList[entity.GetVirtualId()] = entity
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:UpdateEntity"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:UpdateEntity"))
 	}
 	return nil
 }
@@ -1744,24 +1745,24 @@ func (obj *TGDBConnection) EntityDeleted(entity tgdb.TGEntity) {
 // NodeAdded gets called when a node is Added
 func (obj *TGDBConnection) NodeAdded(graph tgdb.TGGraph, node tgdb.TGNode) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:NodeAdded to add Node: '%+v' to Graph: '%+v'", node, graph))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:NodeAdded to add Node: '%+v' to Graph: '%+v'", node, graph))
 	}
 	entityId := graph.(*Graph).GetVirtualId()
 	obj.addedList[entityId] = graph
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:NodeAdded"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:NodeAdded"))
 	}
 }
 
 // NodeRemoved gets called when a node is removed
 func (obj *TGDBConnection) NodeRemoved(graph tgdb.TGGraph, node tgdb.TGNode) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering TGDBConnection:NodeRemoved to remove Node: '%+v' to Graph: '%+v'", node, graph))
+		logger.Debug(fmt.Sprintf("Entering TGDBConnection:NodeRemoved to remove Node: '%+v' to Graph: '%+v'", node, graph))
 	}
 	entityId := graph.(*Graph).GetVirtualId()
 	obj.removedList[entityId] = graph
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning TGDBConnection:NodeRemoved"))
+		logger.Debug(fmt.Sprint("Returning TGDBConnection:NodeRemoved"))
 	}
 }
 
@@ -1780,7 +1781,6 @@ func (obj *TGDBConnection) String() string {
 	buffer.WriteString("}")
 	return buffer.String()
 }
-
 
 // ======= Various Connection Pool States =======
 const (
@@ -1840,11 +1840,11 @@ func defaultTGConnectionPool() *ConnectionPoolImpl {
 
 func NewTGConnectionPool(url tgdb.TGChannelUrl, poolSize int, props *SortedProperties, connType tgdb.TypeConnection) *ConnectionPoolImpl {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering ConnectionPoolImpl:NewTGConnectionPool w/ ChannelURL: '%+v', Poolsize: '%d'", url.GetUrlAsString(), poolSize))
+		logger.Debug(fmt.Sprintf("Entering ConnectionPoolImpl:NewTGConnectionPool w/ ChannelURL: '%+v', Poolsize: '%d'", url.GetUrlAsString(), poolSize))
 	}
 	cp := defaultTGConnectionPool()
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside ConnectionPoolImpl:NewTGConnectionPool w/ Default Connection Pool: '%s'", cp.String()))
+		logger.Debug(fmt.Sprintf("Inside ConnectionPoolImpl:NewTGConnectionPool w/ Default Connection Pool: '%s'", cp.String()))
 	}
 	cp.connType = connType
 	cp.poolProperties = props
@@ -1864,7 +1864,7 @@ func NewTGConnectionPool(url tgdb.TGChannelUrl, poolSize int, props *SortedPrope
 	for i := 0; i < cp.poolSize; i++ {
 		if ch == nil || cp.useDedicateChannel {
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside ConnectionPoolImpl:NewTGConnectionPool - about to channelFactory.CreateChannelWithUrlProperties() for URL: '%s'", url.GetUrlAsString()))
+				logger.Debug(fmt.Sprintf("Inside ConnectionPoolImpl:NewTGConnectionPool - about to channelFactory.CreateChannelWithUrlProperties() for URL: '%s'", url.GetUrlAsString()))
 			}
 			// Create a channel from channel factory
 			channel1, err := channelFactory.CreateChannelWithUrlProperties(url, props)
@@ -1895,7 +1895,7 @@ func NewTGConnectionPool(url tgdb.TGChannelUrl, poolSize int, props *SortedPrope
 	} // End of For loop for Pool Size
 	cp.poolState = ConnectionPoolInitialized
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning ConnectionPoolImpl:NewTGConnectionPool w/ Connection Pool: '%s'", cp.String()))
+		logger.Debug(fmt.Sprintf("Returning ConnectionPoolImpl:NewTGConnectionPool w/ Connection Pool: '%s'", cp.String()))
 	}
 	return cp
 }
@@ -1932,7 +1932,7 @@ func (obj *ConnectionPoolImpl) GetPoolState() int {
 // GetConnection returns an available connection from the pool that is NOT being used or nil if timeout elapses
 func (obj *ConnectionPoolImpl) GetConnection() (tgdb.TGConnection, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering ConnectionPoolImpl:GetConnection for Pool Type: '%+v'", obj.connType))
+		logger.Debug(fmt.Sprintf("Entering ConnectionPoolImpl:GetConnection for Pool Type: '%+v'", obj.connType))
 	}
 	obj.adminLock.Lock()
 	defer obj.adminLock.Unlock()
@@ -1944,7 +1944,7 @@ func (obj *ConnectionPoolImpl) GetConnection() (tgdb.TGConnection, tgdb.TGError)
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside ConnectionPoolImpl:GetConnection - about to pull connection from obj.ConnPool"))
+		logger.Debug(fmt.Sprintf("Inside ConnectionPoolImpl:GetConnection - about to pull connection from obj.ConnPool"))
 	}
 	var conn tgdb.TGConnection
 	// Search through all available connections within the pooled set to find out which one is free to service next
@@ -1965,7 +1965,7 @@ func (obj *ConnectionPoolImpl) GetConnection() (tgdb.TGConnection, tgdb.TGError)
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning ConnectionPoolImpl:GetConnection w/ Connection: '%+v'", conn))
+		logger.Debug(fmt.Sprintf("Returning ConnectionPoolImpl:GetConnection w/ Connection: '%+v'", conn))
 	}
 	return conn, nil
 }
@@ -2004,7 +2004,6 @@ func (obj *ConnectionPoolImpl) Connect() tgdb.TGError {
 	// Attempt to connect using each of the available connections in the pool
 	for i := 0; i < len(obj.connList); i++ {
 		conn := obj.connList[i]
-
 
 		// Proceed when the connection is either in Initialized OR Disconnected (OR Stopped???) state
 		if logger.IsDebug() {
@@ -2094,7 +2093,7 @@ func (obj *ConnectionPoolImpl) ReleaseConnection(conn tgdb.TGConnection) (tgdb.T
 	if ok {
 		delete(obj.consumers, tgConn.GetConnectionId())
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside ConnectionPoolImpl::ReleaseConnection Consumer Loop about to return connection to obj.ConnPool"))
+			logger.Debug(fmt.Sprint("Inside ConnectionPoolImpl::ReleaseConnection Consumer Loop about to return connection to obj.ConnPool"))
 		}
 		obj.chanPool <- tgConn
 	} else {
@@ -2102,14 +2101,14 @@ func (obj *ConnectionPoolImpl) ReleaseConnection(conn tgdb.TGConnection) (tgdb.T
 		if ok {
 			delete(obj.consumers, tgAdminConn.TGDBConnection.GetConnectionId())
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprint("Inside ConnectionPoolImpl::ReleaseConnection Consumer Loop about to return connection to obj.ConnPool"))
+				logger.Debug(fmt.Sprint("Inside ConnectionPoolImpl::ReleaseConnection Consumer Loop about to return connection to obj.ConnPool"))
 			}
 			obj.chanPool <- tgAdminConn
 		}
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning ConnectionPoolImpl:ReleaseConnection"))
+		logger.Debug(fmt.Sprint("Returning ConnectionPoolImpl:ReleaseConnection"))
 	}
 	return obj, nil
 }
@@ -2134,10 +2133,6 @@ func (obj *ConnectionPoolImpl) String() string {
 	buffer.WriteString("}")
 	return buffer.String()
 }
-
-
-
-
 
 type AdminConnectionImpl struct {
 	*TGDBConnection
@@ -2253,7 +2248,7 @@ func configureAdminRequest(adminReq *AdminRequestMessage, option interface{}) {
 // executeAdminRequest executes an immediate command with associated parameters
 func (obj *AdminConnectionImpl) executeAdminRequest(command AdminCommand, parameters interface{}) (interface{}, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:ExecuteAdminRequest for Admin Command: '%+v'", command))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:ExecuteAdminRequest for Admin Command: '%+v'", command))
 	}
 	//err := obj.InitMetadata()
 	//if err != nil {
@@ -2263,7 +2258,7 @@ func (obj *AdminConnectionImpl) executeAdminRequest(command AdminCommand, parame
 	defer obj.connPoolImpl.AdminUnlock()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteAdminRequest about to createChannelRequest() for: pdu.VerbQueryRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteAdminRequest about to createChannelRequest() for: pdu.VerbQueryRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbAdminRequest)
@@ -2274,12 +2269,12 @@ func (obj *AdminConnectionImpl) executeAdminRequest(command AdminCommand, parame
 	adminRequest := msgRequest.(*AdminRequestMessage)
 	adminRequest.SetCommand(command)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteAdminRequest about to obj.configureQueryRequest() for: AdminRequestMessage"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteAdminRequest about to obj.configureQueryRequest() for: AdminRequestMessage"))
 	}
 	configureAdminRequest(adminRequest, parameters)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteAdminRequest about to obj.GetChannel().SendRequest() for: pdu.VerbAdminRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteAdminRequest about to obj.GetChannel().SendRequest() for: pdu.VerbAdminRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(adminRequest, channelResponse.(*BlockingChannelResponse))
@@ -2288,7 +2283,7 @@ func (obj *AdminConnectionImpl) executeAdminRequest(command AdminCommand, parame
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::ExecuteAdminRequest received response for: pdu.VerbAdminRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::ExecuteAdminRequest received response for: pdu.VerbAdminRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*AdminResponseMessage)
 
@@ -2298,7 +2293,7 @@ func (obj *AdminConnectionImpl) executeAdminRequest(command AdminCommand, parame
 	//}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:ExecuteAdminRequest w/ '%+v'", response))
+		logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:ExecuteAdminRequest w/ '%+v'", response))
 	}
 	return obj.populateResultSetFromAdminResponse(command, response)
 }
@@ -2483,7 +2478,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromQueryResponse(resultId int,
 
 func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResponse *GetEntityResponseMessage) (tgdb.TGResultSet, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:populateResultSetFromGetEntitiesResponse w/ MsgResponse: '%+v'", msgResponse.String()))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:populateResultSetFromGetEntitiesResponse w/ MsgResponse: '%+v'", msgResponse.String()))
 	}
 	if !msgResponse.GetHasResult() {
 		logger.Error(fmt.Sprint("ERROR: Returning AdminConnectionImpl:populateResultSetFromGetEntitiesResponse as msgResponse does not have any results"))
@@ -2501,7 +2496,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResp
 		return nil, GetErrorByType(TGErrorGeneralException, "", errMsg, err.Error())
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse extracted totalCount: '%d'", totalCount))
+		logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse extracted totalCount: '%d'", totalCount))
 	}
 	if totalCount > 0 {
 		respStream.SetReferenceMap(fetchedEntities)
@@ -2525,7 +2520,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResp
 			return nil, GetErrorByType(TGErrorGeneralException, "", errMsg, err.Error())
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse read isResult: '%+v'", isResult))
+			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse read isResult: '%+v'", isResult))
 		}
 		entityType, err := respStream.(*ProtocolDataInputStream).ReadByte()
 		if err != nil {
@@ -2535,7 +2530,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResp
 		}
 		kindId := tgdb.TGEntityKind(entityType)
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
+			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
 		}
 		if kindId != tgdb.EntityKindInvalid {
 			entityId, err := respStream.(*ProtocolDataInputStream).ReadLong()
@@ -2546,7 +2541,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResp
 			}
 			entity := fetchedEntities[entityId]
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
+				logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
 			}
 			switch kindId {
 			case tgdb.EntityKindNode:
@@ -2563,7 +2558,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResp
 					entity = node
 					fetchedEntities[entityId] = node
 					if logger.IsDebug() {
-											logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse created new node: '%+v'", node))
+						logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse created new node: '%+v'", node))
 					}
 				}
 				node = *(entity.(*Node))
@@ -2591,7 +2586,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResp
 					entity = edge
 					fetchedEntities[entityId] = edge
 					if logger.IsDebug() {
-											logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse created new edge: '%+v'", edge))
+						logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntitiesResponse created new edge: '%+v'", edge))
 					}
 				}
 				edge = *(entity.(*Edge))
@@ -2614,14 +2609,14 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntitiesResponse(msgResp
 		} // Valid entity types
 	} // End of for loop
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:populateResultSetFromGetEntitiesResponse w/ ResultSe: '%+v'", rSet))
+		logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:populateResultSetFromGetEntitiesResponse w/ ResultSe: '%+v'", rSet))
 	}
 	return rSet, nil
 }
 
 func (obj *AdminConnectionImpl) populateResultSetFromGetEntityResponse(msgResponse *GetEntityResponseMessage) (tgdb.TGEntity, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:populateResultSetFromGetEntityResponse w/ MsgResponse: '%+v'", msgResponse.String()))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:populateResultSetFromGetEntityResponse w/ MsgResponse: '%+v'", msgResponse.String()))
 	}
 	if !msgResponse.GetHasResult() {
 		logger.Error(fmt.Sprint("ERROR: Returning AdminConnectionImpl:populateResultSetFromGetEntityResponse as msgResponse does not have any results"))
@@ -2642,7 +2637,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntityResponse(msgRespon
 		return nil, GetErrorByType(TGErrorGeneralException, "", errMsg, err.Error())
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse extracted Count: '%d'", count))
+		logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse extracted Count: '%d'", count))
 	}
 	if count > 0 {
 		respStream.SetReferenceMap(fetchedEntities)
@@ -2655,7 +2650,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntityResponse(msgRespon
 			}
 			kindId := tgdb.TGEntityKind(entityType)
 			if logger.IsDebug() {
-							logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
+				logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse extracted entityType: '%+v', kindId: '%d'", entityType, kindId))
 			}
 			if kindId != tgdb.EntityKindInvalid {
 				entityId, err := respStream.(*ProtocolDataInputStream).ReadLong()
@@ -2666,7 +2661,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntityResponse(msgRespon
 				}
 				entity := fetchedEntities[entityId]
 				if logger.IsDebug() {
-									logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
+					logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse extracted entityId: '%d', entity: '%+v'", entityId, entity))
 				}
 				switch kindId {
 				case tgdb.EntityKindNode:
@@ -2687,7 +2682,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntityResponse(msgRespon
 							entityFound = node
 						}
 						if logger.IsDebug() {
-													logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse created new node: '%+v'", entity))
+							logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse created new node: '%+v'", entity))
 						}
 					}
 					node = *(entity.(*Node))
@@ -2714,7 +2709,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntityResponse(msgRespon
 							entityFound = edge
 						}
 						if logger.IsDebug() {
-													logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse created new edge: '%+v'", edge))
+							logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::populateResultSetFromGetEntityResponse created new edge: '%+v'", edge))
 						}
 					}
 					edge = *(entity.(*Edge))
@@ -2734,7 +2729,7 @@ func (obj *AdminConnectionImpl) populateResultSetFromGetEntityResponse(msgRespon
 		} // End of for loop
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:populateResultSetFromGetEntityResponse w/ Entity: '%+v'", entityFound))
+		logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:populateResultSetFromGetEntityResponse w/ Entity: '%+v'", entityFound))
 	}
 	return entityFound, nil
 }
@@ -2755,7 +2750,7 @@ func (obj *AdminConnectionImpl) CheckpointServer() tgdb.TGError {
 // DumpServerStackTrace prints the stack trace
 func (obj *AdminConnectionImpl) DumpServerStackTrace() tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:DumpServerStackTrace for Admin Command: DumpServerStackTrace"))
+		logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:DumpServerStackTrace for Admin Command: DumpServerStackTrace"))
 	}
 	//err := obj.InitMetadata()
 	//if err != nil {
@@ -2765,7 +2760,7 @@ func (obj *AdminConnectionImpl) DumpServerStackTrace() tgdb.TGError {
 	defer obj.connPoolImpl.AdminUnlock()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::DumpServerStackTrace about to createChannelRequest() for: pdu.DumpServerStackTrace"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::DumpServerStackTrace about to createChannelRequest() for: pdu.DumpServerStackTrace"))
 	}
 	// Create a channel request
 	msgRequest, _, cErr := createChannelRequest(obj, VerbDumpStacktraceRequest)
@@ -2776,7 +2771,7 @@ func (obj *AdminConnectionImpl) DumpServerStackTrace() tgdb.TGError {
 	dumpStackRequest := msgRequest.(*DumpStacktraceRequestMessage)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::DumpServerStackTrace about to obj.GetChannel().SendRequest() for: pdu.VerbDumpStacktraceRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::DumpServerStackTrace about to obj.GetChannel().SendRequest() for: pdu.VerbDumpStacktraceRequest"))
 	}
 	// Execute request on channel and get the response
 	channelErr := obj.GetChannel().SendMessage(dumpStackRequest)
@@ -2786,7 +2781,7 @@ func (obj *AdminConnectionImpl) DumpServerStackTrace() tgdb.TGError {
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:DumpServerStackTrace for Admin Command: DumpServerStackTrace"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:DumpServerStackTrace for Admin Command: DumpServerStackTrace"))
 	}
 	return nil
 }
@@ -3124,7 +3119,7 @@ func (obj *AdminConnectionImpl) CreateQuery(expr string) (tgdb.TGQuery, tgdb.TGE
 // DecryptBuffer decrypts the encrypted buffer by sending a DecryptBufferRequest to the server
 func (obj *AdminConnectionImpl) DecryptBuffer(is tgdb.TGInputStream) ([]byte, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:DecryptBuffer w/ EncryptedBuffer"))
+		logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:DecryptBuffer w/ EncryptedBuffer"))
 	}
 	//err := obj.InitMetadata()
 	//if err != nil {
@@ -3387,7 +3382,7 @@ func (obj *AdminConnectionImpl) ExecuteQueryWithFilter(expr, edgeFilter, travers
 // ExecuteQueryWithId executes an immediate query for specified id & query options
 func (obj *AdminConnectionImpl) ExecuteQueryWithId(queryHashId int64, options tgdb.TGQueryOption) (tgdb.TGResultSet, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:ExecuteQueryWithId for QueryHashId: '%+v'", queryHashId))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:ExecuteQueryWithId for QueryHashId: '%+v'", queryHashId))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -3397,7 +3392,7 @@ func (obj *AdminConnectionImpl) ExecuteQueryWithId(queryHashId int64, options tg
 	defer obj.connPoolImpl.AdminUnlock()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteQueryWithId about to createChannelRequest() for: pdu.VerbQueryRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteQueryWithId about to createChannelRequest() for: pdu.VerbQueryRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbQueryRequest)
@@ -3409,12 +3404,12 @@ func (obj *AdminConnectionImpl) ExecuteQueryWithId(queryHashId int64, options tg
 	queryRequest.SetCommand(EXECUTED)
 	queryRequest.SetQueryHashId(queryHashId)
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteQueryWithId about to obj.configureQueryRequest() for: pdu.VerbQueryRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteQueryWithId about to obj.configureQueryRequest() for: pdu.VerbQueryRequest"))
 	}
 	configureQueryRequest(queryRequest, options)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteQueryWithId about to obj.GetChannel().SendRequest() for: pdu.VerbQueryRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::ExecuteQueryWithId about to obj.GetChannel().SendRequest() for: pdu.VerbQueryRequest"))
 	}
 	// Execute request on channel and get the response
 	_, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -3424,7 +3419,7 @@ func (obj *AdminConnectionImpl) ExecuteQueryWithId(queryHashId int64, options tg
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:ExecuteQueryWithId"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:ExecuteQueryWithId"))
 	}
 	return nil, nil
 }
@@ -3457,7 +3452,7 @@ func (obj *AdminConnectionImpl) GetConnectionProperties() tgdb.TGProperties {
 // GetEntities gets a result set of entities given an non-uniqueKey
 func (obj *AdminConnectionImpl) GetEntities(qryKey tgdb.TGKey, props tgdb.TGProperties) (tgdb.TGResultSet, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:GetEntities for QueryKey: '%+v'", qryKey))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:GetEntities for QueryKey: '%+v'", qryKey))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -3471,7 +3466,7 @@ func (obj *AdminConnectionImpl) GetEntities(qryKey tgdb.TGKey, props tgdb.TGProp
 		props = NewQueryOption()
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntities about to createChannelRequest() for: pdu.VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntities about to createChannelRequest() for: pdu.VerbGetEntityRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbGetEntityRequest)
@@ -3485,7 +3480,7 @@ func (obj *AdminConnectionImpl) GetEntities(qryKey tgdb.TGKey, props tgdb.TGProp
 	configureGetRequest(queryRequest, props)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntities about to obj.GetChannel().SendRequest() for: pdu.VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntities about to obj.GetChannel().SendRequest() for: pdu.VerbGetEntityRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -3494,7 +3489,7 @@ func (obj *AdminConnectionImpl) GetEntities(qryKey tgdb.TGKey, props tgdb.TGProp
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetEntities received response for: pdu.VerbGetEntityRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetEntities received response for: pdu.VerbGetEntityRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*GetEntityResponseMessage)
 
@@ -3504,7 +3499,7 @@ func (obj *AdminConnectionImpl) GetEntities(qryKey tgdb.TGKey, props tgdb.TGProp
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:GetEntities w/ '%+v'", response))
+		logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:GetEntities w/ '%+v'", response))
 	}
 	return obj.populateResultSetFromGetEntitiesResponse(response)
 }
@@ -3512,7 +3507,7 @@ func (obj *AdminConnectionImpl) GetEntities(qryKey tgdb.TGKey, props tgdb.TGProp
 // GetEntity gets an Entity given an UniqueKey for the Object
 func (obj *AdminConnectionImpl) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQueryOption) (tgdb.TGEntity, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:GetEntity for QueryKey: '%+v'", qryKey))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:GetEntity for QueryKey: '%+v'", qryKey))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -3526,7 +3521,7 @@ func (obj *AdminConnectionImpl) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQuer
 		options = NewQueryOption()
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntity about to createChannelRequest() for: pdu.VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntity about to createChannelRequest() for: pdu.VerbGetEntityRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbGetEntityRequest)
@@ -3540,7 +3535,7 @@ func (obj *AdminConnectionImpl) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQuer
 	configureGetRequest(queryRequest, options)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntity about to obj.GetChannel().SendRequest() for: pdu.VerbGetEntityRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetEntity about to obj.GetChannel().SendRequest() for: pdu.VerbGetEntityRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -3549,7 +3544,7 @@ func (obj *AdminConnectionImpl) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQuer
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetEntity received response for: pdu.VerbGetEntityRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetEntity received response for: pdu.VerbGetEntityRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*GetEntityResponseMessage)
 
@@ -3559,7 +3554,7 @@ func (obj *AdminConnectionImpl) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQuer
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:GetEntity w/ '%+v'", response))
+		logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:GetEntity w/ '%+v'", response))
 	}
 	return obj.populateResultSetFromGetEntityResponse(response)
 }
@@ -3567,14 +3562,14 @@ func (obj *AdminConnectionImpl) GetEntity(qryKey tgdb.TGKey, options tgdb.TGQuer
 // GetGraphMetadata gets the Graph Metadata
 func (obj *AdminConnectionImpl) GetGraphMetadata(refresh bool) (tgdb.TGGraphMetadata, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:GetGraphMetadata"))
+		logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:GetGraphMetadata"))
 	}
 	if refresh {
 		obj.connPoolImpl.AdminLock()
 		defer obj.connPoolImpl.AdminUnlock()
 
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata about to createChannelRequest() for: pdu.VerbMetadataRequest"))
+			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata about to createChannelRequest() for: pdu.VerbMetadataRequest"))
 		}
 		// Create a channel request
 		msgRequest, channelResponse, err := createChannelRequest(obj, VerbMetadataRequest)
@@ -3584,11 +3579,11 @@ func (obj *AdminConnectionImpl) GetGraphMetadata(refresh bool) (tgdb.TGGraphMeta
 		}
 		metaRequest := msgRequest.(*MetadataRequest)
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetGraphMetadata createChannelRequest() returned MsgRequest: '%+v' ChannelResponse: '%+v'", msgRequest, channelResponse.(*BlockingChannelResponse)))
+			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetGraphMetadata createChannelRequest() returned MsgRequest: '%+v' ChannelResponse: '%+v'", msgRequest, channelResponse.(*BlockingChannelResponse)))
 		}
 
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata about to obj.GetChannel().SendRequest() for: pdu.VerbMetadataRequest"))
+			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata about to obj.GetChannel().SendRequest() for: pdu.VerbMetadataRequest"))
 		}
 		// Execute request on channel and get the response
 		msgResponse, channelErr := obj.GetChannel().SendRequest(metaRequest, channelResponse.(*BlockingChannelResponse))
@@ -3605,7 +3600,7 @@ func (obj *AdminConnectionImpl) GetGraphMetadata(refresh bool) (tgdb.TGGraphMeta
 
 		gmd := obj.graphObjFactory.GetGraphMetaData()
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata about to update GraphMetadata"))
+			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata about to update GraphMetadata"))
 		}
 		uErr := gmd.UpdateMetadata(attrDescList, nodeTypeList, edgeTypeList)
 		if uErr != nil {
@@ -3613,11 +3608,11 @@ func (obj *AdminConnectionImpl) GetGraphMetadata(refresh bool) (tgdb.TGGraphMeta
 			return nil, uErr
 		}
 		if logger.IsDebug() {
-					logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata successfully updated GraphMetadata"))
+			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetGraphMetadata successfully updated GraphMetadata"))
 		}
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:GetGraphMetadata"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:GetGraphMetadata"))
 	}
 	return obj.graphObjFactory.GetGraphMetaData(), nil
 }
@@ -3625,7 +3620,7 @@ func (obj *AdminConnectionImpl) GetGraphMetadata(refresh bool) (tgdb.TGGraphMeta
 // GetGraphObjectFactory gets the Graph Object Factory for Object creation
 func (obj *AdminConnectionImpl) GetGraphObjectFactory() (tgdb.TGGraphObjectFactory, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:GetGraphObjectFactory"))
+		logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:GetGraphObjectFactory"))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -3633,7 +3628,7 @@ func (obj *AdminConnectionImpl) GetGraphObjectFactory() (tgdb.TGGraphObjectFacto
 		return nil, err
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:GetGraphObjectFactory"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:GetGraphObjectFactory"))
 	}
 	return obj.graphObjFactory, nil
 }
@@ -3641,7 +3636,7 @@ func (obj *AdminConnectionImpl) GetGraphObjectFactory() (tgdb.TGGraphObjectFacto
 // GetLargeObjectAsBytes gets an Binary Large Object Entity given an UniqueKey for the Object
 func (obj *AdminConnectionImpl) GetLargeObjectAsBytes(entityId int64, decryptFlag bool) ([]byte, tgdb.TGError) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:GetLargeObjectAsBytes for EntityId: '%+v'", entityId))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:GetLargeObjectAsBytes for EntityId: '%+v'", entityId))
 	}
 	err := obj.InitMetadata()
 	if err != nil {
@@ -3652,7 +3647,7 @@ func (obj *AdminConnectionImpl) GetLargeObjectAsBytes(entityId int64, decryptFla
 	defer obj.connPoolImpl.AdminUnlock()
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetLargeObjectAsBytes about to createChannelRequest() for: pdu.VerbGetLargeObjectRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetLargeObjectAsBytes about to createChannelRequest() for: pdu.VerbGetLargeObjectRequest"))
 	}
 	// Create a channel request
 	msgRequest, channelResponse, cErr := createChannelRequest(obj, VerbGetLargeObjectRequest)
@@ -3665,7 +3660,7 @@ func (obj *AdminConnectionImpl) GetLargeObjectAsBytes(entityId int64, decryptFla
 	queryRequest.SetDecryption(decryptFlag)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetLargeObjectAsBytes about to obj.GetChannel().SendRequest() for: pdu.VerbGetLargeObjectRequest"))
+		logger.Debug(fmt.Sprint("Inside AdminConnectionImpl::GetLargeObjectAsBytes about to obj.GetChannel().SendRequest() for: pdu.VerbGetLargeObjectRequest"))
 	}
 	// Execute request on channel and get the response
 	msgResponse, channelErr := obj.GetChannel().SendRequest(queryRequest, channelResponse.(*BlockingChannelResponse))
@@ -3674,7 +3669,7 @@ func (obj *AdminConnectionImpl) GetLargeObjectAsBytes(entityId int64, decryptFla
 		return nil, channelErr
 	}
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetLargeObjectAsBytes received response for: pdu.VerbGetLargeObjectRequest as '%+v'", msgResponse))
+		logger.Debug(fmt.Sprintf("Inside AdminConnectionImpl::GetLargeObjectAsBytes received response for: pdu.VerbGetLargeObjectRequest as '%+v'", msgResponse))
 	}
 	response := msgResponse.(*GetLargeObjectResponseMessage)
 
@@ -3685,7 +3680,7 @@ func (obj *AdminConnectionImpl) GetLargeObjectAsBytes(entityId int64, decryptFla
 	}
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:GetLargeObjectAsBytes w/ '%+v'", response.GetBuffer()))
+		logger.Debug(fmt.Sprintf("Returning AdminConnectionImpl:GetLargeObjectAsBytes w/ '%+v'", response.GetBuffer()))
 	}
 	return response.GetBuffer(), nil
 }
@@ -3698,11 +3693,11 @@ func (obj *AdminConnectionImpl) GetRemovedList() map[int64]tgdb.TGEntity {
 // InsertEntity marks an ENTITY for insert operation. Upon commit, the entity will be inserted in the database
 func (obj *AdminConnectionImpl) InsertEntity(entity tgdb.TGEntity) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:InsertEntity to insert Entity: '%+v'", entity.GetEntityType()))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:InsertEntity to insert Entity: '%+v'", entity.GetEntityType()))
 	}
 	obj.addedList[entity.GetVirtualId()] = entity
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:InsertEntity"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:InsertEntity"))
 	}
 	return nil
 }
@@ -3710,7 +3705,7 @@ func (obj *AdminConnectionImpl) InsertEntity(entity tgdb.TGEntity) tgdb.TGError 
 // Rollback rolls back the current transaction on this connection
 func (obj *AdminConnectionImpl) Rollback() tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:Rollback"))
+		logger.Debug(fmt.Sprint("Entering AdminConnectionImpl:Rollback"))
 	}
 	obj.connPoolImpl.AdminLock()
 	defer obj.connPoolImpl.AdminUnlock()
@@ -3722,7 +3717,7 @@ func (obj *AdminConnectionImpl) Rollback() tgdb.TGError {
 	obj.attrByTypeList = make(map[int][]tgdb.TGAttribute, 0)
 
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:Rollback"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:Rollback"))
 	}
 	return nil
 }
@@ -3739,11 +3734,11 @@ func (obj *AdminConnectionImpl) SetExceptionListener(listener tgdb.TGConnectionE
 // The same entity cannot be updated on multiple connections. It will result an TGException of already associated to a connection.
 func (obj *AdminConnectionImpl) UpdateEntity(entity tgdb.TGEntity) tgdb.TGError {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:UpdateEntity to update Entity: '%+v'", entity))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:UpdateEntity to update Entity: '%+v'", entity))
 	}
 	obj.changedList[entity.GetVirtualId()] = entity
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:UpdateEntity"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:UpdateEntity"))
 	}
 	return nil
 }
@@ -3800,24 +3795,24 @@ func (obj *AdminConnectionImpl) EntityDeleted(entity tgdb.TGEntity) {
 // NodeAdded gets called when a node is Added
 func (obj *AdminConnectionImpl) NodeAdded(graph tgdb.TGGraph, node tgdb.TGNode) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:NodeAdded to add Node: '%+v' to Graph: '%+v'", node, graph))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:NodeAdded to add Node: '%+v' to Graph: '%+v'", node, graph))
 	}
 	entityId := graph.(*Graph).GetVirtualId()
 	obj.addedList[entityId] = graph
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:NodeAdded"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:NodeAdded"))
 	}
 }
 
 // NodeRemoved gets called when a node is removed
 func (obj *AdminConnectionImpl) NodeRemoved(graph tgdb.TGGraph, node tgdb.TGNode) {
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:NodeRemoved to remove Node: '%+v' to Graph: '%+v'", node, graph))
+		logger.Debug(fmt.Sprintf("Entering AdminConnectionImpl:NodeRemoved to remove Node: '%+v' to Graph: '%+v'", node, graph))
 	}
 	entityId := graph.(*Graph).GetVirtualId()
 	obj.removedList[entityId] = graph
 	if logger.IsDebug() {
-			logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:NodeRemoved"))
+		logger.Debug(fmt.Sprint("Returning AdminConnectionImpl:NodeRemoved"))
 	}
 }
 
@@ -3836,9 +3831,6 @@ func (obj *AdminConnectionImpl) String() string {
 	buffer.WriteString("}")
 	return buffer.String()
 }
-
-
-
 
 // Create a connection on the url using the Name and password
 // Each connection will create a dedicated Channel for connection.
@@ -4042,8 +4034,6 @@ func (obj *AdminConnectionImpl) String() string {
 // </table>
 //
 
-
-
 type TransactionImpl struct {
 	transactionId int64
 }
@@ -4128,8 +4118,6 @@ func (obj *TransactionImpl) UnmarshalBinary(data []byte) error {
 	return nil
 }
 
-
-
 type TGConnectionFactoryImpl struct {
 }
 
@@ -4153,7 +4141,7 @@ func (obj *TGConnectionFactoryImpl) CreateConnection(url, user, pwd string, env 
 		return nil, err
 	}
 	if logger.IsDebug() {
-		logger.Debug(fmt.Sprintf("Returning TGConnectionFactory:CreateConnection w/ connection '%+v'",  conn))
+		logger.Debug(fmt.Sprintf("Returning TGConnectionFactory:CreateConnection w/ connection '%+v'", conn))
 	}
 	return conn, nil
 }
@@ -4177,7 +4165,7 @@ func (obj *TGConnectionFactoryImpl) CreateAdminConnection(url, user, pwd string,
 		return nil, err
 	}
 	if logger.IsDebug() {
-		logger.Debug(fmt.Sprintf("Returning TGConnectionFactory:CreateAdminConnection w/ connection '%+v'",  conn))
+		logger.Debug(fmt.Sprintf("Returning TGConnectionFactory:CreateAdminConnection w/ connection '%+v'", conn))
 	}
 	return conn, nil
 }
@@ -4227,14 +4215,10 @@ func (obj *TGConnectionFactoryImpl) CreateConnectionPoolWithType(url, user, pwd 
 	_ = SetUserAndPassword(props, user, pwd) // Ignore Error Handling
 	// At this point, the consolidated property set is already sorted by key a.k.a. property Name
 	if logger.IsDebug() {
-		logger.Debug(fmt.Sprintf("Returning TGConnectionFactory:CreateConnectionPool about to initiate NewTGConnectionPool() for URL: '%+v'",  channelUrl.String()))
+		logger.Debug(fmt.Sprintf("Returning TGConnectionFactory:CreateConnectionPool about to initiate NewTGConnectionPool() for URL: '%+v'", channelUrl.String()))
 	}
 	return NewTGConnectionPool(channelUrl, poolSize, props, connType), nil
 }
-
-
-
-
 
 //var logger = impl.DefaultTGLogManager().GetLogger()
 
