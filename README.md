@@ -60,7 +60,7 @@ func searchAndUpdate(conn tgdb.TGConnection) {
 		if node, ok := member.(tgdb.TGNode); ok {
 			edges := node.GetEdges()
 			fmt.Printf("check relationships: %d\n", len(edges))
-			// this does not work becaue above call always returns 0 edge
+			// this does not work because above call always returns 0 edge
 			for _, edge := range edges {
 				n := edge.GetVertices()
 				fmt.Printf("relationship '%v': %v -> %v\n", edge.GetAttribute("relType").GetValue(),
