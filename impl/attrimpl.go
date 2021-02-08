@@ -51,8 +51,8 @@ const (
 	AttributeTypeDate
 	AttributeTypeTime
 	AttributeTypeTimeStamp
-	AttributeTypeBlob
 	AttributeTypeClob
+	AttributeTypeBlob
 )
 
 type AttributeType struct {
