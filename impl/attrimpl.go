@@ -3599,9 +3599,9 @@ func NewTimestampAttributeWithDesc(ownerEntity tgdb.TGEntity, attrDesc *Attribut
 /////////////////////////////////////////////////////////////////
 
 func (obj *TimestampAttribute) SetCalendar(b time.Time) {
-	if !obj.IsNull() {
-		return
-	}
+	//if !obj.IsNull() {
+	//	return
+	//}
 	obj.AttrValue = b
 	obj.setIsModified(true)
 }
@@ -3866,7 +3866,7 @@ func (obj *TimestampAttribute) WriteValue(os tgdb.TGOutputStream) tgdb.TGError {
 	hr := v.Hour()
 	min := v.Minute()
 	sec := v.Second()
-	msec := v.Nanosecond() / 1000
+	msec := v.Nanosecond() / 1000000
 	switch obj.AttrDesc.GetAttrType() {
 	case AttributeTypeDate:
 		os.(*ProtocolDataOutputStream).WriteBoolean(era)

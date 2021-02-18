@@ -78,31 +78,31 @@ func (txnStatus TGTransactionStatus) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString("")
 
-	if txnStatus&TGTransactionInvalid == TGTransactionInvalid {
+	if txnStatus == TGTransactionInvalid {
 		buffer.WriteString("TransactionInvalid")
-	} else if txnStatus&TGTransactionSuccess == TGTransactionSuccess {
+	} else if txnStatus == TGTransactionSuccess {
 		buffer.WriteString("TransactionSuccess")
-	} else if txnStatus&TGTransactionAlreadyInProgress == TGTransactionAlreadyInProgress {
+	} else if txnStatus == TGTransactionAlreadyInProgress {
 		buffer.WriteString("TransactionAlreadyInProgress")
-	} else if txnStatus&TGTransactionClientDisconnected == TGTransactionClientDisconnected {
+	} else if txnStatus == TGTransactionClientDisconnected {
 		buffer.WriteString("TransactionClientDisconnected")
-	} else if txnStatus&TGTransactionMalFormed == TGTransactionMalFormed {
+	} else if txnStatus == TGTransactionMalFormed {
 		buffer.WriteString("TransactionMalFormed")
-	} else if txnStatus&TGTransactionGeneralError == TGTransactionGeneralError {
+	} else if txnStatus == TGTransactionGeneralError {
 		buffer.WriteString("TransactionGeneralError")
-	} else if txnStatus&TGTransactionVerificationError == TGTransactionVerificationError {
+	} else if txnStatus == TGTransactionVerificationError {
 		buffer.WriteString("TransactionVerificationError")
-	} else if txnStatus&TGTransactionInBadState == TGTransactionInBadState {
+	} else if txnStatus == TGTransactionInBadState {
 		buffer.WriteString("TransactionInBadState")
-	} else if txnStatus&TGTransactionUniqueConstraintViolation == TGTransactionUniqueConstraintViolation {
+	} else if txnStatus == TGTransactionUniqueConstraintViolation {
 		buffer.WriteString("TransactionUniqueConstraintViolation")
-	} else if txnStatus&TGTransactionOptimisticLockFailed == TGTransactionOptimisticLockFailed {
+	} else if txnStatus == TGTransactionOptimisticLockFailed {
 		buffer.WriteString("TransactionOptimisticLockFailed")
-	} else if txnStatus&TGTransactionResourceExceeded == TGTransactionResourceExceeded {
+	} else if txnStatus == TGTransactionResourceExceeded {
 		buffer.WriteString("TransactionResourceExceeded")
-	} else if txnStatus&TGCurrentThreadNotInTransaction == TGCurrentThreadNotInTransaction {
+	} else if txnStatus == TGCurrentThreadNotInTransaction {
 		buffer.WriteString("CurrentThreadNotInTransaction")
-	} else if txnStatus&TGTransactionUniqueIndexKeyAttributeNullError == TGTransactionUniqueIndexKeyAttributeNullError {
+	} else if txnStatus == TGTransactionUniqueIndexKeyAttributeNullError {
 		buffer.WriteString("TransactionUniqueIndexKeyAttributeNullError")
 	}
 	if buffer.Len() == 0 {
@@ -110,4 +110,3 @@ func (txnStatus TGTransactionStatus) String() string {
 	}
 	return buffer.String()
 }
-

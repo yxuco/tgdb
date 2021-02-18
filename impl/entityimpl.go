@@ -508,7 +508,7 @@ func (obj *AbstractEntity) AbstractEntityWriteExternal(os tgdb.TGOutputStream) t
 	for _, attr := range obj.Attributes {
 		// If an attribute is not modified, do not include in the stream
 		if !attr.GetIsModified() {
-			logger.Warning(fmt.Sprint("WARNING: Continuing loop AbstractEntity:AbstractEntityWriteExternal as attr is NOT modified"))
+			logger.Warning(fmt.Sprintf("WARNING: Continuing loop AbstractEntity:AbstractEntityWriteExternal as attr %s is NOT modified", attr.GetName()))
 			continue
 		}
 		err := attr.WriteExternal(os)
@@ -1945,7 +1945,7 @@ func (obj *Edge) ReadExternal(is tgdb.TGInputStream) tgdb.TGError {
 // WriteExternal writes a system object into an appropriate byte format onto an external output stream
 func (obj *Edge) WriteExternal(os tgdb.TGOutputStream) tgdb.TGError {
 	if logger.IsDebug() {
-		logger.Debug(fmt.Sprint("Entering Edge:WriteExternal"))
+		logger.Debug(fmt.Sprintf("Entering Edge:WriteExternal with direction %v", obj.GetDirectionType()))
 	}
 	startPos := os.(*ProtocolDataOutputStream).GetPosition()
 	os.(*ProtocolDataOutputStream).WriteInt(0)
